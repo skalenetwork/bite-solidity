@@ -1,0 +1,35 @@
+name: test
+on: [push, pull_request]
+
+env:
+  NODE_VERSION: 22
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'yarn'
+
+    - name: Install project
+      run: yarn
+
+    - name: Compile
+      run: yarn compile
+
+    - name: lint
+      run: yarn fullCheck
+
+    - name: slither
+      uses: crytic/slither-action@v0.4.0
+      with:
+        ignore-compile: true
+        node-version: ${{ env.NODE_VERSION }}
