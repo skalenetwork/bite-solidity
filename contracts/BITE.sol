@@ -23,8 +23,6 @@
 
 pragma solidity ^0.8.24;
 
-import { PublicKey } from "./types.sol";
-
 
 /**
  * @title BITE Library
