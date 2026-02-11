@@ -9,9 +9,9 @@ Solidity helpers to interact with BITE
 
 pragma solidity ^0.8.24;
 
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
-import {BITE} from "@skalenetwork/bite-solidity/BITE.sol";
-import {IBiteSupplicant} from "../interfaces/bite/IBiteSupplicant.sol";
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+import { BITE } from "@skalenetwork/bite-solidity/BITE.sol";
+import { IBiteSupplicant } from "@skalenetwork/bite-solidity/interfaces/IBiteSupplicant.sol";
 
 
 contract Example is IBiteSupplicant {
