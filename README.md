@@ -9,17 +9,20 @@ Solidity helpers to interact with BITE
 
 pragma solidity ^0.8.24;
 
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import {BITE} from "@skalenetwork/bite-solidity/BITE.sol";
 import {IBiteSupplicant} from "../interfaces/bite/IBiteSupplicant.sol";
 
 
 contract Example is IBiteSupplicant {
+    using Address for address payable;
+
     bytes public decryptedMessage;
     address public ctxSender;
 
     error AccessViolation();
 
-    function decrypt(bytes calldata cipher) external {
+    function decrypt(bytes calldata cipher) external payable {
         bytes[] memory encryptedArgs = new bytes[](1);
         encryptedArgs[0] = cipher;
 
@@ -27,10 +30,12 @@ contract Example is IBiteSupplicant {
 
         ctxSender = BITE.submitCTX(
             BITE.SUBMIT_CTX_ADDRESS,
-            1_000_000,
+            msg.value / tx.gasprice,
             encryptedArgs,
             plaintextArgs
         );
+
+        payable(ctxSender).sendValue(msg.value);
     }
 
     function onDecrypt(
