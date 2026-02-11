@@ -1,9 +1,12 @@
 {
   "extends": "solhint:all",
   "rules": {
+    "foundry-test-function-naming": "off",
     "foundry-test-functions": "off",
 
+    "const-name-snakecase": "error",
     "explicit-types": "error",
+    "func-visibility": ["error", { "ignoreConstructors": true }],
     "imports-order": "error",
     "gas-named-return-values": "error",
     "gas-struct-packing": "error",

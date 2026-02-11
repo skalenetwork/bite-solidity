@@ -1096,6 +1096,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openzeppelin/contracts@npm:5.4.0":
+  version: 5.4.0
+  resolution: "@openzeppelin/contracts@npm:5.4.0"
+  checksum: 10c0/7e05646dee4905fea4493f0fb2ad208abaff84b9f5ef1b9e1a5fc61d0e74d9bc30759bdf0d09a08049cfef6a290623330d83469eadc990a7bba6c2cd09a27e1d
+  languageName: node
+  linkType: hard
+
 "@pnpm/config.env-replace@npm:^1.1.0":
   version: 1.1.0
   resolution: "@pnpm/config.env-replace@npm:1.1.0"
@@ -1272,16 +1279,17 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@skalenetwork/bite-solidity@workspace:."
   dependencies:
+    "@openzeppelin/contracts": "npm:5.4.0"
     "@types/node": "npm:>=18.0.0"
     cspell: "npm:^8.17.5"
     hardhat: "npm:^2.22.19"
-    solhint: "npm:^5.0.5"
+    solhint: "npm:^6.0.3"
     ts-node: "npm:>=8.0.0"
     typescript: "npm:>=4.5.0"
   languageName: unknown
   linkType: soft
 
-"@solidity-parser/parser@npm:^0.20.0":
+"@solidity-parser/parser@npm:^0.20.2":
   version: 0.20.2
   resolution: "@solidity-parser/parser@npm:0.20.2"
   checksum: 10c0/23b0b7ed343a4fa55cb8621cf4fc81b0bdd791a4ee7e96ced7778db07de66d4e418db2c2dc1525b1f82fc0310ac829c78382327292b37e35cb30a19961fcb429
@@ -1470,13 +1478,6 @@ __metadata:
   dependencies:
     color-convert: "npm:^2.0.1"
   checksum: 10c0/895a23929da416f2bd3de7e9cb4eabd340949328ab85ddd6e484a637d8f6820d485f53933446f5291c3b760cbc488beb8e88573dd0f9c7daf83dccc8fe81b041
-  languageName: node
-  linkType: hard
-
-"antlr4@npm:^4.13.1-patch-1":
-  version: 4.13.2
-  resolution: "antlr4@npm:4.13.2"
-  checksum: 10c0/dfe7dcb24fe99ce103e1eac3ce30558a3df713cf5deeacd7e30686f5cca8206864e49b254af3bd5eff5904d31e5cd7902a7468c13dcb619da10caf3f703d03b4
   languageName: node
   linkType: hard
 
@@ -2351,17 +2352,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:^11.1.0":
-  version: 11.3.3
-  resolution: "fs-extra@npm:11.3.3"
-  dependencies:
-    graceful-fs: "npm:^4.2.0"
-    jsonfile: "npm:^6.0.1"
-    universalify: "npm:^2.0.0"
-  checksum: 10c0/984924ff4104e3e9f351b658a864bf3b354b2c90429f57aec0acd12d92c4e6b762cbacacdffb4e745b280adce882e1f980c485d9f02c453f769ab4e7fc646ce3
-  languageName: node
-  linkType: hard
-
 "fs-extra@npm:^7.0.1":
   version: 7.0.1
   resolution: "fs-extra@npm:7.0.1"
@@ -2497,7 +2487,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.6":
+"graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.6":
   version: 4.2.11
   resolution: "graceful-fs@npm:4.2.11"
   checksum: 10c0/386d011a553e02bc594ac2ca0bd6d9e4c22d7fa8cfbfc448a6d148c59ea881b092db9dbe3547ae4b88e55f1b01f7c4a2ecc53b310c042793e63aa44cf6c257f2
@@ -2904,19 +2894,6 @@ __metadata:
     graceful-fs:
       optional: true
   checksum: 10c0/7dc94b628d57a66b71fb1b79510d460d662eb975b5f876d723f81549c2e9cd316d58a2ddf742b2b93a4fa6b17b2accaf1a738a0e2ea114bdfb13a32e5377e480
-  languageName: node
-  linkType: hard
-
-"jsonfile@npm:^6.0.1":
-  version: 6.2.0
-  resolution: "jsonfile@npm:6.2.0"
-  dependencies:
-    graceful-fs: "npm:^4.1.6"
-    universalify: "npm:^2.0.0"
-  dependenciesMeta:
-    graceful-fs:
-      optional: true
-  checksum: 10c0/7f4f43b08d1869ded8a6822213d13ae3b99d651151d77efd1557ced0889c466296a7d9684e397bd126acf5eb2cfcb605808c3e681d0fdccd2fe5a04b47e76c0d
   languageName: node
   linkType: hard
 
@@ -3800,21 +3777,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"solhint@npm:^5.0.5":
-  version: 5.2.0
-  resolution: "solhint@npm:5.2.0"
+"solhint@npm:^6.0.3":
+  version: 6.0.3
+  resolution: "solhint@npm:6.0.3"
   dependencies:
-    "@solidity-parser/parser": "npm:^0.20.0"
+    "@solidity-parser/parser": "npm:^0.20.2"
     ajv: "npm:^6.12.6"
     ajv-errors: "npm:^1.0.1"
-    antlr4: "npm:^4.13.1-patch-1"
     ast-parents: "npm:^0.0.1"
     better-ajv-errors: "npm:^2.0.2"
     chalk: "npm:^4.1.2"
     commander: "npm:^10.0.0"
     cosmiconfig: "npm:^8.0.0"
     fast-diff: "npm:^1.2.0"
-    fs-extra: "npm:^11.1.0"
     glob: "npm:^8.0.3"
     ignore: "npm:^5.2.4"
     js-yaml: "npm:^4.1.0"
@@ -3823,7 +3798,6 @@ __metadata:
     pluralize: "npm:^8.0.0"
     prettier: "npm:^2.8.3"
     semver: "npm:^7.5.2"
-    strip-ansi: "npm:^6.0.1"
     table: "npm:^6.8.1"
     text-table: "npm:^0.2.0"
   dependenciesMeta:
@@ -3831,7 +3805,7 @@ __metadata:
       optional: true
   bin:
     solhint: solhint.js
-  checksum: 10c0/acabdef7d869d1c2bf7b2f76747c9547342dac20d075972f55ff2fed41e9b1704dfb50f9a0f20b40db31e9a2a00eca19c36cb8ebf52e98c48fb39c1dbcfd6970
+  checksum: 10c0/1dad7354ee19a29e3c642c5a03a3d716132d9df9780693f95f41f7ebfac2039e2b0b49f690a35488a712382599e25173560fd6628661eadfcbc0a96505526efa
   languageName: node
   linkType: hard
 
@@ -4137,13 +4111,6 @@ __metadata:
   version: 0.1.2
   resolution: "universalify@npm:0.1.2"
   checksum: 10c0/e70e0339f6b36f34c9816f6bf9662372bd241714dc77508d231d08386d94f2c4aa1ba1318614f92015f40d45aae1b9075cd30bd490efbe39387b60a76ca3f045
-  languageName: node
-  linkType: hard
-
-"universalify@npm:^2.0.0":
-  version: 2.0.1
-  resolution: "universalify@npm:2.0.1"
-  checksum: 10c0/73e8ee3809041ca8b818efb141801a1004e3fc0002727f1531f4de613ea281b494a40909596dae4a042a4fb6cd385af5d4db2e137b1362e0e91384b828effd3a
   languageName: node
   linkType: hard
 
