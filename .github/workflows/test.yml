@@ -74,11 +74,11 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'yarn'
 
-    - name: Convert solc files
-      run: scripts/to_solidity_0.8.5.sh
-
     - name: Install project
       run: yarn
+
+    - name: Convert solc files
+      run: scripts/to_solidity_0.8.5.sh
 
     - name: Compile
       env:
