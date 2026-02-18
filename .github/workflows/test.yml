@@ -77,7 +77,7 @@ jobs:
     - name: Install project
       run: yarn
 
-    - name: Convert solc files
+    - name: Remove modern solc files
       run: scripts/to_solidity_0.8.5.sh
 
     - name: Compile
