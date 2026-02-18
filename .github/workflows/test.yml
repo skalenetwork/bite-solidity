@@ -53,6 +53,9 @@ jobs:
     - name: Install project
       run: yarn
 
+    - name: Remove too old solc files
+      run: rm contracts/VeryVeryVeryVeryLegacyBITE.sol
+
     - name: Compile
       env:
         SOLC_VERSION: ${{ matrix.solc }}
