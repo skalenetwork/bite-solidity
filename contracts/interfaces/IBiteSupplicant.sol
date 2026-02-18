@@ -19,7 +19,7 @@
  *   along with bite-solidity.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity >=0.1.1 <0.9.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 
 /// @title IBiteSupplicant
