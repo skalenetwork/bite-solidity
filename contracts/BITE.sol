@@ -21,7 +21,7 @@
 
 // cspell:words ECIES
 
-pragma solidity >=0.1.1 <0.9.0;
+pragma solidity >=0.8.27 <0.9.0;
 
 
 /**
