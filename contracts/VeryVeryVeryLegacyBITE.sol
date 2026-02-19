@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 /*
-    BITE.sol - bite-solidity
+    VeryVeryVeryLegacyBITE.sol - bite-solidity
     Copyright (C) 2026-Present SKALE Labs
     @author Dmytro Stebaiev
 
@@ -21,7 +21,14 @@
 
 // cspell:words ECIES
 
-pragma solidity >=0.8.27;
+// Disable gas-custom-errors because old versions of Solidity don't support custom errors
+// solhint-disable gas-custom-errors
+
+// This file is developed for using with old solidity versions.abi
+// solhint-disable compiler-version
+
+pragma solidity >=0.6.0;
+pragma experimental ABIEncoderV2;
 
 
 /**
@@ -37,9 +44,6 @@ library BITE {
     /// @notice Emitted when a CTX is successfully submitted
     /// @param callbackSender The address that will send the callback
     event CTXSubmitted(address indexed callbackSender);
-
-    error PrecompiledCallFailed(address precompiledContract);
-    error IncorrectReturnDataLength(address precompiledContract, uint256 expected, uint256 actual);
 
     /// @notice Calls the SubmitCTX precompiled contract
     /// @param submitCTXAddress The address of the SubmitCTX precompiled contract
@@ -66,11 +70,8 @@ library BITE {
                 )
             )
         );
-        require(
-            addressBytes.length == 20,
-            IncorrectReturnDataLength(submitCTXAddress, 20, addressBytes.length)
-        );
-        callbackSender = payable(address(bytes20(addressBytes)));
+        require(addressBytes.length == 20, "Incorrect return data length");
+        callbackSender = payable(address(_toBytes20(addressBytes)));
         // The system precompiled contract is called.
         // It's trusted and doesn't perform any external calls,
         // so reentrancy is not an issue here.
@@ -100,7 +101,13 @@ library BITE {
             bool success,
             bytes memory out
         ) = precompiledContract.call(input); // solhint-disable-line avoid-low-level-calls
-        require(success, PrecompiledCallFailed(precompiledContract));
+        require(success, "Precompiled call failed");
         return out;
+    }
+
+    function _toBytes20(bytes memory data) private pure returns (bytes20 data_) {
+        for (uint256 i = 0; i < 20; ++i) {
+            data_ |= bytes20(data[i]) >> (i * 8);
+        }
     }
 }

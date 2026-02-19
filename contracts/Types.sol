@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 /**
- *   IBiteSupplicant.sol - bite-solidity
+ *   Types.sol - bite-solidity
  *   Copyright (C) 2026-Present SKALE Labs
  *   @author Dmytro Stebaiev
  *
@@ -22,18 +22,17 @@
 // This file is developed for using with old solidity versions.abi
 // solhint-disable compiler-version
 
-pragma solidity >=0.8.0;
+pragma solidity >=0.5.0;
 
 
-/// @title IBiteSupplicant
+/// @title Types Library
 /// @author Dmytro Stebaiev
-/// @notice Interface for contracts that can handle decrypted data from BITE
-interface IBiteSupplicant {
-    /// @notice Called by the DecryptAndExecute precompiled contract after decryption
-    /// @param decryptedArguments The decrypted arguments
-    /// @param plaintextArguments The plaintext arguments
-    function onDecrypt(
-        bytes[] calldata decryptedArguments,
-        bytes[] calldata plaintextArguments
-    ) external;
+/// @notice Library for types used in BITE contracts
+/// @dev Don't use this library for modern solidity versions
+/// @dev This is legacy version of the types.sol
+library Types {
+    struct PublicKey {
+        bytes32 x;
+        bytes32 y;
+    }
 }
