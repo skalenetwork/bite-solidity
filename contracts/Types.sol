@@ -22,6 +22,11 @@
 pragma solidity >=0.1.1 <0.9.0;
 
 
+/// @title Types Library
+/// @author Dmytro Stebaiev
+/// @notice Library for types used in BITE contracts
+/// @dev Don't use this library for modern solidity versions
+/// @dev This is legacy version of the types.sol
 library Types {
     struct PublicKey {
         bytes32 x;

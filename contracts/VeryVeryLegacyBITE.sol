@@ -21,6 +21,9 @@
 
 // cspell:words ECIES
 
+// Disable gas-custom-errors because old versions of Solidity don't support custom errors
+// solhint-disable gas-custom-errors
+
 pragma solidity >=0.8.0 <0.9.0;
 
 

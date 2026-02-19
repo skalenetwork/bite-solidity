@@ -6,11 +6,14 @@
     "foundry-test-functions": "off",
 
     "const-name-snakecase": "error",
+    "constructor-syntax": "error",
     "explicit-types": "error",
     "func-visibility": ["error", { "ignoreConstructors": true }],
     "imports-order": "error",
+    "gas-custom-errors": "error",
     "gas-named-return-values": "error",
     "gas-struct-packing": "error",
-    "ordering": "error"
+    "ordering": "error",
+    "use-natspec": "error"
   }
 }

@@ -19,8 +19,9 @@
     along with bite-solidity.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pragma solidity >=0.1.1 <0.9.0;
+pragma solidity >=0.8.27 <0.9.0;
 
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { ZeroAddress } from "../errors.sol";
 import { IBiteSupplicant } from "../interfaces/IBiteSupplicant.sol";
 
@@ -42,6 +43,7 @@ interface ICallbackSender {
 /// @author Dmytro Stebaiev
 /// @notice Contract to send decryption callbacks to a supplicant
 contract CallbackSender is ICallbackSender{
+    using Address for address payable;
 
     // slither wants immutable variables to be named in camelCase
     // but we together with solhint prefer UPPER_CASE for immutables
@@ -94,7 +96,7 @@ contract CallbackSender is ICallbackSender{
 
     /// @inheritdoc ICallbackSender
     function freeEth() external override {
-        payable(address(0)).transfer(address(this).balance);
+        payable(address(0)).sendValue(address(this).balance);
     }
 
     /// @inheritdoc ICallbackSender
