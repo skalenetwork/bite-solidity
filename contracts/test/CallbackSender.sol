@@ -19,7 +19,7 @@
     along with bite-solidity.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pragma solidity >=0.8.27 <0.9.0;
+pragma solidity >=0.8.27;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { ZeroAddress } from "../errors.sol";

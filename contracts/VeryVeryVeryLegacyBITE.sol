@@ -24,7 +24,10 @@
 // Disable gas-custom-errors because old versions of Solidity don't support custom errors
 // solhint-disable gas-custom-errors
 
-pragma solidity >=0.6.0 <0.9.0;
+// This file is developed for using with old solidity versions.abi
+// solhint-disable compiler-version
+
+pragma solidity >=0.6.0;
 pragma experimental ABIEncoderV2;
 
 

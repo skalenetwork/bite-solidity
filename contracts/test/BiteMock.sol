@@ -21,7 +21,7 @@
 
 // cspell:words deque ECIES
 
-pragma solidity >=0.8.27 <0.9.0;
+pragma solidity >=0.8.27;
 
 import { DoubleEndedQueue } from "@openzeppelin/contracts/utils/structs/DoubleEndedQueue.sol";
 

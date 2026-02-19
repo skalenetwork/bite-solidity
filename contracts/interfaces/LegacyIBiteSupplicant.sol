@@ -19,7 +19,10 @@
  *   along with bite-solidity.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity >=0.1.1 <0.9.0;
+// This file is developed for using with old solidity versions.abi
+// solhint-disable compiler-version
+
+pragma solidity >=0.5.0;
 pragma experimental ABIEncoderV2;
 
 

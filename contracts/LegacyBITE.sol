@@ -21,7 +21,10 @@
 
 // cspell:words ECIES
 
-pragma solidity >=0.8.5 <0.9.0;
+// This file is developed for using with old solidity versions.abi
+// solhint-disable compiler-version
+
+pragma solidity >=0.8.5;
 
 
 /**

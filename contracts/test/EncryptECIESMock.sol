@@ -21,7 +21,7 @@
 
 // cspell:words ECIES
 
-pragma solidity >=0.8.27 <0.9.0;
+pragma solidity >=0.8.27;
 
 import { BiteMock } from "./BiteMock.sol";
 import { PrecompiledMock } from "./PrecompiledMock.sol";
