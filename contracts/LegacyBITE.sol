@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 /*
-    BITE.sol - bite-solidity
+    LegacyBITE.sol - bite-solidity
     Copyright (C) 2026-Present SKALE Labs
     @author Dmytro Stebaiev
 
@@ -21,7 +21,10 @@
 
 // cspell:words ECIES
 
-pragma solidity >=0.8.27;
+// This file is developed for using with old solidity versions.abi
+// solhint-disable compiler-version
+
+pragma solidity >=0.8.5;
 
 
 /**
@@ -66,10 +69,9 @@ library BITE {
                 )
             )
         );
-        require(
-            addressBytes.length == 20,
-            IncorrectReturnDataLength(submitCTXAddress, 20, addressBytes.length)
-        );
+        if(addressBytes.length != 20) {
+            revert IncorrectReturnDataLength(submitCTXAddress, 20, addressBytes.length);
+        }
         callbackSender = payable(address(bytes20(addressBytes)));
         // The system precompiled contract is called.
         // It's trusted and doesn't perform any external calls,
@@ -100,7 +102,9 @@ library BITE {
             bool success,
             bytes memory out
         ) = precompiledContract.call(input); // solhint-disable-line avoid-low-level-calls
-        require(success, PrecompiledCallFailed(precompiledContract));
+        if (!success) {
+            revert PrecompiledCallFailed(precompiledContract);
+        }
         return out;
     }
 }

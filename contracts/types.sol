@@ -19,7 +19,10 @@
  *   along with bite-solidity.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.8.24;
+// This file is developed for using with old solidity versions.abi
+// solhint-disable compiler-version
+
+pragma solidity >=0.6.0;
 
 
 struct PublicKey {
