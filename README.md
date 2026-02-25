@@ -7,7 +7,7 @@ Solidity helpers to interact with BITE
 ```solidity
 // SPDX-License-Identifier: AGPL-3.0-only
 
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.27;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { BITE } from "@skalenetwork/bite-solidity/BITE.sol";
