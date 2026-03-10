@@ -4,6 +4,7 @@
     VeryVeryLegacyBITE.sol - bite-solidity
     Copyright (C) 2026-Present SKALE Labs
     @author Dmytro Stebaiev
+    @author Eduardo Vasques
 
     bite-solidity is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -29,16 +30,32 @@
 
 pragma solidity >=0.8.0;
 
+import { PublicKey } from "./types.sol";
 
 /**
  * @title BITE Library
  * @author Dmytro Stebaiev
+ * @author Eduardo Vasques
  * @notice Library for interacting with SKALE-specific precompiles of BITE
  */
 library BITE {
 
+    /// @notice Address of the EncryptECIES precompiled contract
+    address public constant ENCRYPT_ECIES_ADDRESS = address(0x1C);
+
+    /// @notice Address of the EncryptTE precompiled contract
+    address public constant ENCRYPT_TE_ADDRESS = address(0x1D);
+
     /// @notice Address of the submitCTX precompiled contract
     address public constant SUBMIT_CTX_ADDRESS = address(0x1B);
+
+    /// @dev Minimum return size of ThresholdEncryption precompile - 1
+    /// @dev 292 (min from crypto scheme) + 32 (min encoded size of input) - 1
+    uint256 constant internal TE_RETURN_SIZE_THRESHOLD = 323;
+
+    /// @dev Minimum return size of ECIES precompile - 1
+    /// @dev 65 (min from crypto scheme) + 32 (min encoded size of input) - 1
+    uint256 constant internal ECIES_RETURN_SIZE_THRESHOLD = 96;
 
     /// @notice Emitted when a CTX is successfully submitted
     /// @param callbackSender The address that will send the callback
@@ -78,6 +95,51 @@ library BITE {
         emit CTXSubmitted(callbackSender);
     }
 
+    /// @notice Calls the EncryptTE precompiled contract
+    /// @param encryptTEaddress The address of the EncryptTE precompiled contract
+    /// @param text The plaintext data to encrypt
+    /// @return cipherText The encrypted data returned by the precompiled contract
+    function encryptTE(address encryptTEaddress, bytes memory text) internal view returns (bytes memory cipherText) {
+        cipherText = _staticcallPrecompiled(
+            encryptTEaddress,
+            abi.encode(text)
+        );
+        require(cipherText.length != 0, "Empty return data");
+        require(
+            cipherText.length > TE_RETURN_SIZE_THRESHOLD,
+            "Invalid return data size"
+        );
+    }
+
+    /// @notice Calls the EncryptECIES precompiled contract
+    /// @param encryptECIESaddress The address of the EncryptECIES precompiled contract
+    /// @param text The plaintext data to encrypt
+    /// @param publicKey The public key to use for encryption
+    /// @return cipherText The encrypted data returned by the precompiled contract
+    function encryptECIES(
+        address encryptECIESaddress,
+        bytes memory text,
+        PublicKey memory publicKey
+    )
+        internal
+        view
+        returns (bytes memory cipherText)
+    {
+        cipherText = _staticcallPrecompiled(
+            encryptECIESaddress,
+            abi.encode(
+                text,
+                publicKey.x,
+                publicKey.y
+            )
+        );
+        require(cipherText.length != 0, "Empty return data");
+        require(
+            cipherText.length > ECIES_RETURN_SIZE_THRESHOLD,
+            "Invalid return data size"
+        );
+    }
+
     // Private
 
     /**
@@ -100,6 +162,31 @@ library BITE {
             bool success,
             bytes memory out
         ) = precompiledContract.call(input); // solhint-disable-line avoid-low-level-calls
+        require(success, "Precompiled call failed");
+        return out;
+    }
+
+    /**
+     * @notice Calls a precompiled contract using staticcall
+     * @param precompiledContract The address of the precompiled contract
+     * @param input The input data to pass to the precompiled contract
+     * @return output The output data from the precompiled contract
+     */
+    function _staticcallPrecompiled(
+        address precompiledContract,
+        bytes memory input
+    )
+        private
+        view
+        returns (bytes memory output)
+    {
+        // Have to use low-level calls
+        // because it's the only way to call precompiled contracts
+        // slither-disable-next-line low-level-calls
+        (
+            bool success,
+            bytes memory out
+        ) = precompiledContract.staticcall(input); // solhint-disable-line avoid-low-level-calls
         require(success, "Precompiled call failed");
         return out;
     }
