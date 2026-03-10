@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 /**
- *   IBiteSupplicant.sol - bite-solidity
+ *   LegacyIBiteSupplicant.sol - bite-solidity
  *   Copyright (C) 2026-Present SKALE Labs
  *   @author Dmytro Stebaiev
  *
@@ -22,7 +22,8 @@
 // This file is developed for using with old solidity versions.abi
 // solhint-disable compiler-version
 
-pragma solidity >=0.8.0;
+pragma solidity >=0.5.0;
+pragma experimental ABIEncoderV2;
 
 
 /// @title IBiteSupplicant

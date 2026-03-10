@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 /*
-    BITE.sol - bite-solidity
+    VeryVeryVeryLegacyBITE.sol - bite-solidity
     Copyright (C) 2026-Present SKALE Labs
     @author Dmytro Stebaiev
     @author Eduardo Vasques
@@ -22,7 +22,14 @@
 
 // cspell:words ECIES
 
-pragma solidity >=0.8.27;
+// Disable gas-custom-errors because old versions of Solidity don't support custom errors
+// solhint-disable gas-custom-errors
+
+// This file is developed for using with old solidity versions.abi
+// solhint-disable compiler-version
+
+pragma solidity >=0.6.0;
+pragma experimental ABIEncoderV2;
 
 import { PublicKey } from "./types.sol";
 
@@ -43,23 +50,17 @@ library BITE {
     /// @notice Address of the submitCTX precompiled contract
     address public constant SUBMIT_CTX_ADDRESS = address(0x1B);
 
-    /// @notice Minimum return size of ThresholdEncryption precompile - 1
+    /// @dev Minimum return size of ThresholdEncryption precompile - 1
     /// @dev 292 (min from crypto scheme) + 32 (min encoded size of input) - 1
     uint256 constant internal TE_RETURN_SIZE_THRESHOLD = 323;
 
-    /// @notice Minimum return size of ECIES precompile - 1
+    /// @dev Minimum return size of ECIES precompile - 1
     /// @dev 65 (min from crypto scheme) + 32 (min encoded size of input) - 1
     uint256 constant internal ECIES_RETURN_SIZE_THRESHOLD = 96;
 
     /// @notice Emitted when a CTX is successfully submitted
     /// @param callbackSender The address that will send the callback
     event CTXSubmitted(address indexed callbackSender);
-
-    error PrecompiledCallFailed(address precompiledContract);
-    error EmptyReturnData(address precompiledContract);
-    error IncorrectReturnDataLength(address precompiledContract, uint256 expected, uint256 actual);
-    error InvalidReturnDataSize(address precompiledContract, uint256 expectedMin, uint256 actual);
-
 
     /// @notice Calls the SubmitCTX precompiled contract
     /// @param submitCTXAddress The address of the SubmitCTX precompiled contract
@@ -86,11 +87,8 @@ library BITE {
                 )
             )
         );
-        require(
-            addressBytes.length == 20,
-            IncorrectReturnDataLength(submitCTXAddress, 20, addressBytes.length)
-        );
-        callbackSender = payable(address(bytes20(addressBytes)));
+        require(addressBytes.length == 20, "Incorrect return data length");
+        callbackSender = payable(address(_toBytes20(addressBytes)));
         // The system precompiled contract is called.
         // It's trusted and doesn't perform any external calls,
         // so reentrancy is not an issue here.
@@ -107,10 +105,10 @@ library BITE {
             encryptTEaddress,
             abi.encode(text)
         );
-        require(cipherText.length != 0, EmptyReturnData(encryptTEaddress));
+        require(cipherText.length != 0, "Empty return data");
         require(
             cipherText.length > TE_RETURN_SIZE_THRESHOLD,
-            InvalidReturnDataSize(encryptTEaddress, TE_RETURN_SIZE_THRESHOLD + 1, cipherText.length)
+            "Invalid return data size"
         );
     }
 
@@ -136,10 +134,10 @@ library BITE {
                 publicKey.y
             )
         );
-        require(cipherText.length != 0, EmptyReturnData(encryptECIESaddress));
+        require(cipherText.length != 0, "Empty return data");
         require(
             cipherText.length > ECIES_RETURN_SIZE_THRESHOLD,
-            InvalidReturnDataSize(encryptECIESaddress, ECIES_RETURN_SIZE_THRESHOLD + 1, cipherText.length)
+            "Invalid return data size"
         );
     }
 
@@ -165,7 +163,7 @@ library BITE {
             bool success,
             bytes memory out
         ) = precompiledContract.call(input); // solhint-disable-line avoid-low-level-calls
-        require(success, PrecompiledCallFailed(precompiledContract));
+        require(success, "Precompiled call failed");
         return out;
     }
 
@@ -190,7 +188,13 @@ library BITE {
             bool success,
             bytes memory out
         ) = precompiledContract.staticcall(input); // solhint-disable-line avoid-low-level-calls
-        require(success, PrecompiledCallFailed(precompiledContract));
+        require(success, "Precompiled call failed");
         return out;
+    }
+
+    function _toBytes20(bytes memory data) private pure returns (bytes20 data_) {
+        for (uint256 i = 0; i < 20; ++i) {
+            data_ |= bytes20(data[i]) >> (i * 8);
+        }
     }
 }

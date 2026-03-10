@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 /*
-    BITE.sol - bite-solidity
+    VeryLegacyBITE.sol - bite-solidity
     Copyright (C) 2026-Present SKALE Labs
     @author Dmytro Stebaiev
     @author Eduardo Vasques
@@ -22,7 +22,10 @@
 
 // cspell:words ECIES
 
-pragma solidity >=0.8.27;
+// This file is developed for using with old solidity versions.abi
+// solhint-disable compiler-version
+
+pragma solidity >=0.8.4;
 
 import { PublicKey } from "./types.sol";
 
@@ -86,11 +89,10 @@ library BITE {
                 )
             )
         );
-        require(
-            addressBytes.length == 20,
-            IncorrectReturnDataLength(submitCTXAddress, 20, addressBytes.length)
-        );
-        callbackSender = payable(address(bytes20(addressBytes)));
+        if(addressBytes.length != 20) {
+            revert IncorrectReturnDataLength(submitCTXAddress, 20, addressBytes.length);
+        }
+        callbackSender = payable(address(_toBytes20(addressBytes)));
         // The system precompiled contract is called.
         // It's trusted and doesn't perform any external calls,
         // so reentrancy is not an issue here.
@@ -107,11 +109,13 @@ library BITE {
             encryptTEaddress,
             abi.encode(text)
         );
-        require(cipherText.length != 0, EmptyReturnData(encryptTEaddress));
-        require(
-            cipherText.length > TE_RETURN_SIZE_THRESHOLD,
-            InvalidReturnDataSize(encryptTEaddress, TE_RETURN_SIZE_THRESHOLD + 1, cipherText.length)
-        );
+        if (cipherText.length > TE_RETURN_SIZE_THRESHOLD) {
+            return cipherText;
+        }
+        if (cipherText.length == 0) {
+            revert EmptyReturnData(encryptTEaddress);
+        }
+        revert InvalidReturnDataSize(encryptTEaddress, TE_RETURN_SIZE_THRESHOLD + 1, cipherText.length);
     }
 
     /// @notice Calls the EncryptECIES precompiled contract
@@ -136,11 +140,13 @@ library BITE {
                 publicKey.y
             )
         );
-        require(cipherText.length != 0, EmptyReturnData(encryptECIESaddress));
-        require(
-            cipherText.length > ECIES_RETURN_SIZE_THRESHOLD,
-            InvalidReturnDataSize(encryptECIESaddress, ECIES_RETURN_SIZE_THRESHOLD + 1, cipherText.length)
-        );
+        if (cipherText.length > ECIES_RETURN_SIZE_THRESHOLD) {
+            return cipherText;
+        }
+        if (cipherText.length == 0) {
+            revert EmptyReturnData(encryptECIESaddress);
+        }
+        revert InvalidReturnDataSize(encryptECIESaddress, ECIES_RETURN_SIZE_THRESHOLD + 1, cipherText.length);
     }
 
     // Private
@@ -165,7 +171,9 @@ library BITE {
             bool success,
             bytes memory out
         ) = precompiledContract.call(input); // solhint-disable-line avoid-low-level-calls
-        require(success, PrecompiledCallFailed(precompiledContract));
+        if (!success) {
+            revert PrecompiledCallFailed(precompiledContract);
+        }
         return out;
     }
 
@@ -190,7 +198,15 @@ library BITE {
             bool success,
             bytes memory out
         ) = precompiledContract.staticcall(input); // solhint-disable-line avoid-low-level-calls
-        require(success, PrecompiledCallFailed(precompiledContract));
+        if (!success) {
+            revert PrecompiledCallFailed(precompiledContract);
+        }
         return out;
+    }
+
+    function _toBytes20(bytes memory data) private pure returns (bytes20 data_) {
+        for (uint256 i = 0; i < 20; ++i) {
+            data_ |= bytes20(data[i]) >> (i * 8);
+        }
     }
 }
