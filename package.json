@@ -4,7 +4,7 @@
   "packageManager": "yarn@4.6.0",
   "devDependencies": {
     "@types/node": ">=18.0.0",
-    "cspell": "^9.6.4",
+    "cspell": "^9.7.0",
     "hardhat": "^2.22.19",
     "solhint": "^6.0.3",
     "ts-node": ">=8.0.0",
