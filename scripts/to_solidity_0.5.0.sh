@@ -10,3 +10,4 @@ rm contracts/VeryVeryVeryLegacyBITE.sol
 rm contracts/types.sol
 
 git checkout -- contracts/VeryVeryVeryVeryLegacyBITE.sol
+git checkout -- contracts/LegacyTypes.sol
