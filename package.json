@@ -1,6 +1,6 @@
 {
   "name": "@skalenetwork/bite-solidity",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "packageManager": "yarn@4.6.0",
   "devDependencies": {
     "@types/node": ">=18.0.0",
