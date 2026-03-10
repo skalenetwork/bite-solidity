@@ -22,7 +22,7 @@
 // This file is developed for using with old solidity versions.abi
 // solhint-disable compiler-version
 
-pragma solidity >=0.5.0;
+pragma solidity >=0.5.0 <0.6.0;
 
 
 /// @title Types Library
