@@ -1,3 +1,4 @@
+<!-- cspell:words ECIES hardforks ciphertext -->
 # BITE-solidity
 
 <div align="center">
@@ -186,7 +187,7 @@ const myContract = await MyContract.deploy(
 );
 
 // After a CTX is submitted, manually trigger the decryption callbackHardhat
-// On a real BITE 2 network, this happens automaticaly
+// On a real BITE 2 network, this happens automatically
 await bite.sendCallback();
 ```
 
