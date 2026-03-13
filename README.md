@@ -217,3 +217,18 @@ See the [examples/](examples/) folder for additional usage patterns:
 
 Additionally, for a larger real-world example, see the [SKALE confidential-token repository](https://github.com/skalenetwork/confidential-token) and how it leverages `bite-solidity`.
 
+
+## References & Useful Links
+
+- [SKALE Network Documentation](https://docs.skale.network/)
+- [BITE V2 Protocol Documentation](https://forum.skale.network/t/bite-phase-2-extended-architecture-specification/737)
+
+
+## License
+
+AGPL-3.0-only
+
+This project is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+See [LICENSE](LICENSE) for full terms.
+
