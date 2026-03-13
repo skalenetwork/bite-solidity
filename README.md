@@ -1,4 +1,4 @@
-# bite-solidity
+# BITE-solidity
 
 <div align="center">
 
@@ -10,11 +10,13 @@
 
 </div>
 
+## Introduction
+
 Solidity library for building smart contracts that leverage SKALE's BITE 2 blockchain capabilities. It exposes wrappers around the BITE-specific precompiled contracts for threshold encryption (TE), ECIES encryption, and conditional transaction (CTX) submission, plus the callback interface that contracts must implement.
 
-# Installation
+## Installation
 
-## Clone with submodules
+### Clone with submodules
 
 ```bash
 git clone --recurse-submodules https://github.com/skalenetwork/bite-solidity.git
@@ -26,18 +28,18 @@ If you already cloned without submodules:
 git submodule update --init --recursive
 ```
 
-## Prerequisites
+### Prerequisites
 
 - Node.js 22+
 - Yarn 4+
 
-## Install dependencies
+### Install dependencies
 
 ```bash
 yarn install
 ```
 
-## Use as a package dependency
+### Use as a package dependency
 
 Add to your own Hardhat or Foundry project:
 
@@ -47,9 +49,9 @@ yarn add @skalenetwork/bite-solidity
 npm install @skalenetwork/bite-solidity
 ```
 
-# Usage
+## Usage
 
-## Overview
+### Overview
 
 BITE 2 blockchains expose three precompiled contracts that enable confidential computation:
 
@@ -65,9 +67,33 @@ The general flow for using a CTX is:
 2. Submit the encrypted payload as a CTX via `BITE.submitCTX()`. The call returns a `callbackSender` address — fund it with enough ETH to cover the callback gas.
 3. Implement `IBiteSupplicant` in your contract. When the BITE node finishes decryption it will call `onDecrypt()` from that address.
 
-## Basic example — Threshold Encryption CTX
+**Important:** For now, we recommend compiling contracts that interact with BITE precompiles using EVM version `istanbul` (for example, `evmVersion: "istanbul"`). Compatibility with newer hardforks is still in progress.
+
+Hardhat example:
+
+```ts
+export default {
+    solidity: {
+        version: "0.8.27",
+        settings: {
+            evmVersion: "istanbul"
+        }
+    }
+};
+```
+
+Foundry example (`foundry.toml`):
+
+```toml
+[profile.default]
+evm_version = "istanbul"
+```
+
+### Basic example — Threshold Encryption CTX
 
 The simplest integration: a contract that accepts an already-TE-encrypted ciphertext, submits it as a CTX, and stores the decrypted result when the callback arrives at block N+1.
+
+**NOTE:** This contract allows only for 1 call to `decrypt` per block - do not use this pattern for production-grade contracts due to how ctxSender is stored.
 
 ```solidity
 // SPDX-License-Identifier: AGPL-3.0-only
@@ -125,7 +151,7 @@ contract Example is IBiteSupplicant {
 
 To produce ciphertext before calling `decrypt()`, either call `encrypt(plaintext)` on this contract, or directly use the TE precompile.
 
-## ECIES encryption
+### ECIES encryption
 
 ECIES encrypts data for a single recipient identified by their secp256k1 public key. Use the `PublicKey` struct from `types.sol`:
 
