@@ -64,22 +64,22 @@ const EncryptECIESMock = await ethers.getContractFactory("EncryptECIESMock");
 const encryptECIESMock = await EncryptECIESMock.deploy(await bite.getAddress());
 
 
-// NOTE: Leverage your local testing network cheatcodes. This example uses hardhat cheatcodes
+// NOTE: Leverage your local testing network cheat codes. This example uses hardhat node
 const runtimeBytecode1 = await ethers.provider.getCode(await submitCTXMock.getAddress());
 const runtimeBytecode2 = await ethers.provider.getCode(await encryptTEMock.getAddress());
 const runtimeBytecode3 = await ethers.provider.getCode(await encryptECIESMock.getAddress());
 
-await network.privider.send("hardhat_setCode", [
+await network.provider.send("hardhat_setCode", [
     "0x1B",
     runtimeBytecode1
 ]);
 
-await network.privider.send("hardhat_setCode", [
+await network.provider.send("hardhat_setCode", [
     "0x1C",
     runtimeBytecode3
 ]);
 
-await network.privider.send("hardhat_setCode", [
+await network.provider.send("hardhat_setCode", [
     "0x1D",
     runtimeBytecode2
 ]);
@@ -91,7 +91,7 @@ await myContract.waitForDeployment();
 
 await myContract.someMethodThatUsesCTX();
 
-// Needs to manualy trigger callback stored in BiteMock.sol contract
+// Needs to manually trigger callback stored in BiteMock.sol contract
 await bite.sendCallback();
 ```
 
