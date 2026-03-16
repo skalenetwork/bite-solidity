@@ -16,14 +16,6 @@ BITE 2 blockchains expose three precompiled contracts for confidential computati
 | `EncryptECIES` | `0x1C` | Encrypts data for a specific recipient public key |
 | `EncryptTE` | `0x1D` | Encrypts data with the network threshold key |
 
-Typical flow:
-
-0. Send encrypted transaction (Off-chain) encrypted with BITE 1.
-1. Encrypt sensitive data with `BITE.encryptTE()` or `BITE.encryptECIES()`.
-2. Submit encrypted payload via `BITE.submitCTX()`.
-3. Fund returned `callbackSender` with enough ETH to cover callback gas.
-4. Handle callback in `IBiteSupplicant.onDecrypt()` function.
-
 ## Compiler compatibility
 
 For contracts that interact with BITE precompiles, we recommend using EVM version `istanbul` for now.
@@ -56,7 +48,7 @@ evm_version = "istanbul"
 
 ## Local testing with mocks
 
-The `contracts/test/` folder in this repository contains mocks for the BITE precompiles so you can test logic locally without a live BITE 2 node.
+The `contracts/test/` folder in this repository contains mocks for the BITE precompiles so you can test logic locally in your repository without a live BITE 2 node.
 
 ```typescript
 const BiteMock = await ethers.getContractFactory("BiteMock");
@@ -68,11 +60,38 @@ const submitCTXMock = await SubmitCTXMock.deploy(await bite.getAddress());
 const EncryptTEMock = await ethers.getContractFactory("EncryptTEMock");
 const encryptTEMock = await EncryptTEMock.deploy(await bite.getAddress());
 
-const myContract = await MyContract.deploy(
-	await encryptTEMock.getAddress(),
-	await submitCTXMock.getAddress()
-);
+const EncryptECIESMock = await ethers.getContractFactory("EncryptECIESMock");
+const encryptECIESMock = await EncryptECIESMock.deploy(await bite.getAddress());
 
+
+// NOTE: Leverage your local testing network cheatcodes. This example uses hardhat cheatcodes
+const runtimeBytecode1 = await ethers.provider.getCode(await submitCTXMock.getAddress());
+const runtimeBytecode2 = await ethers.provider.getCode(await encryptTEMock.getAddress());
+const runtimeBytecode3 = await ethers.provider.getCode(await encryptECIESMock.getAddress());
+
+await network.privider.send("hardhat_setCode", [
+    "0x1B",
+    runtimeBytecode1
+]);
+
+await network.privider.send("hardhat_setCode", [
+    "0x1C",
+    runtimeBytecode3
+]);
+
+await network.privider.send("hardhat_setCode", [
+    "0x1D",
+    runtimeBytecode2
+]);
+
+// Once setup ready, deploy and use contract that implements BITE.sol
+const myContractFactory = await ethers.getContractFactory("MyBiteContract");
+const myContract = await myContractFactory.deploy();
+await myContract.waitForDeployment();
+
+await myContract.someMethodThatUsesCTX();
+
+// Needs to manualy trigger callback stored in BiteMock.sol contract
 await bite.sendCallback();
 ```
 
