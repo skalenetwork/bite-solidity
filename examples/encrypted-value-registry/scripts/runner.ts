@@ -1,8 +1,14 @@
+// cspell:words ciphertext
+
 import { ethers, JsonRpcProvider, SigningKey } from "ethers";
 import crypto from "crypto";
+import { BITE } from "@skalenetwork/bite";
 
+// should be the deployer's private key
 const PRIVATE_KEY = "";
+// should be BITE 2 chain
 const RPC_URL = "https://base-sepolia-testnet.skalenodes.com/v1/bite-v2-sandbox";
+// should be the address of the deployed EncryptedValueRegistry contract
 const CONTRACT_ADDRESS = "";
 
 const abi = [
@@ -35,12 +41,39 @@ const abi = [
         stateMutability: "view",
         type: "function",
     },
+    {
+        inputs: [],
+        name: "owner",
+        outputs: [{ internalType: "address", name: "", type: "address" }],
+        stateMutability: "view",
+        type: "function",
+    },
 ];
 
 const provider = new JsonRpcProvider(RPC_URL);
 const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
 const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
+const bite = new BITE(RPC_URL);
 
+
+async function waitForEncryptedValue(
+    timeoutMs: number,
+    pollIntervalMs: number
+): Promise<string> {
+    const startedAt = Date.now();
+
+    while ((Date.now() - startedAt) < timeoutMs) {
+        const encryptedValue = await contract.getEncryptedValue({
+            from: wallet.address
+        }) as string;
+        if (encryptedValue !== "0x") {
+            return encryptedValue;
+        }
+        await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+    }
+
+    throw new Error("Timed out waiting for callback to populate encrypted value");
+}
 
 function decrypt(privateKey, encryptedHex) {
     const data = Buffer.from(encryptedHex.replace(/^0x/, ""), "hex");
@@ -76,22 +109,27 @@ async function grantAccess() {
     const contractWithSigner = contract.connect(wallet);
 
     const publicKey = derivePublicKey(PRIVATE_KEY);
+    const owner = await contractWithSigner.owner();
 
-    const tx = await contractWithSigner.grantAccess(publicKey, {
-        gasLimit: 200000,
+    if (owner.toLowerCase() !== wallet.address.toLowerCase()) {
+        throw new Error("Only the contract owner can grant access.");
+    }
+
+    const grantTx = await contractWithSigner.grantAccess.populateTransaction(publicKey, {
         value: 1_000_000_000_000n,
     });
+    const encryptedGrantTx = await bite.encryptTransaction({...grantTx, gasLimit: "300000"});
+    const txResponse = await wallet.sendTransaction(encryptedGrantTx);
+    await txResponse.wait();
 
-    await tx.wait();
-
+    console.log(`grantAccess tx hash: ${txResponse.hash}`);
     console.log("Access granted");
 }
 
 async function decryptData() {
-    const ciphertext = await contract.getEncryptedValue({
-        from: wallet.address
-    });
-    console.log(ciphertext);
+    // Wait up to 30s for the BITE callback to land (block N+1)
+    const ciphertext = await waitForEncryptedValue(30_000, 2_000);
+    console.log(`Encrypted value after callback: ${ciphertext}`);
     const decrypted = decrypt(PRIVATE_KEY, ciphertext);
 
     const decryptedValue = BigInt("0x" + decrypted.toString("hex")).toString();
