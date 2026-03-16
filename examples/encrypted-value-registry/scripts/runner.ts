@@ -1,4 +1,4 @@
-
+// cspell:words ciphertext
 import { ethers, JsonRpcProvider, SigningKey } from "ethers";
 import crypto from "crypto";
 import { BITE } from "@skalenetwork/bite";
