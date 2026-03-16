@@ -1,15 +1,17 @@
-// cspell:words ciphertext
 
 import { ethers, JsonRpcProvider, SigningKey } from "ethers";
 import crypto from "crypto";
 import { BITE } from "@skalenetwork/bite";
 
+import dotenv from "dotenv"
+dotenv.config({ quiet: true });
+
 // should be the deployer's private key
-const PRIVATE_KEY = "";
+const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
 // should be BITE 2 chain
-const RPC_URL = "https://base-sepolia-testnet.skalenodes.com/v1/bite-v2-sandbox";
+const RPC_URL = process.env.ENDPOINT ||"https://base-sepolia-testnet.skalenodes.com/v1/bite-v2-sandbox";
 // should be the address of the deployed EncryptedValueRegistry contract
-const CONTRACT_ADDRESS = "";
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || "";
 
 const abi = [
     {
@@ -75,7 +77,7 @@ async function waitForEncryptedValue(
     throw new Error("Timed out waiting for callback to populate encrypted value");
 }
 
-function decrypt(privateKey, encryptedHex) {
+function decrypt(privateKey: string, encryptedHex: string) {
     const data = Buffer.from(encryptedHex.replace(/^0x/, ""), "hex");
 
     const iv = data.slice(0, 16);
@@ -93,7 +95,7 @@ function decrypt(privateKey, encryptedHex) {
     return Buffer.concat([decipher.update(ciphertext), decipher.final()]);
 }
 
-function derivePublicKey(privateKey) {
+function derivePublicKey(privateKey: ethers.BytesLike) {
     const signingKey = new SigningKey(privateKey);
 
     const publicKey = signingKey.publicKey;
@@ -106,7 +108,7 @@ function derivePublicKey(privateKey) {
 
 
 async function grantAccess() {
-    const contractWithSigner = contract.connect(wallet);
+    const contractWithSigner = contract.connect(wallet) as any;
 
     const publicKey = derivePublicKey(PRIVATE_KEY);
     const owner = await contractWithSigner.owner();

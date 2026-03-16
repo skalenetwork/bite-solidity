@@ -90,15 +90,25 @@ PRIVATE_KEY=0x... ENDPOINT=https://... npx hardhat run scripts/hardhatRunner.ts 
 
 ### `runner.ts` — Standalone ethers.js
 
-This script uses **ethers.js** and the `@skalenetwork/bite` library (no Hardhat dependency). It is aimed at interacting with an **already-deployed** contract. Configure the three constants at the top of the file before running:
+This script uses **ethers.js** and the `@skalenetwork/bite` library (no Hardhat dependency). It is aimed at interacting with an **already-deployed** contract. It loads configuration from environment variables via `dotenv`.
 
-```typescript
-const PRIVATE_KEY        = ""; // Deployer/owner private key
-const RPC_URL            = "https://…"; // BITE 2 RPC endpoint
-const CONTRACT_ADDRESS   = ""; // Address of a deployed EncryptedValueRegistry
-```
+**Environment variables**
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `PRIVATE_KEY` | yes | — | Deployer/owner private key |
+| `ENDPOINT` | no | `https://base-sepolia-testnet.skalenodes.com/v1/bite-v2-sandbox` | RPC endpoint used both for chain access and BITE transaction encryption |
+| `CONTRACT_ADDRESS` | yes | — | Address of a deployed `EncryptedValueRegistry` |
+
+You can provide them either in your shell, in a local `.env` file, or hardcode them in the script.
 
 **Run**
+
+```bash
+PRIVATE_KEY=0x... ENDPOINT=https://... CONTRACT_ADDRESS=0x... npx ts-node scripts/runner.ts
+```
+
+or with a `.env` file or with hardcoded values simply:
 
 ```bash
 npx ts-node scripts/runner.ts
