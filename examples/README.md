@@ -2,9 +2,45 @@
 
 # Examples
 
-This folder contains standalone usage examples for `bite-solidity`. Each subdirectory is a self-contained project demonstrating a specific set of BITE 2 features.
+This folder is a **Yarn workspaces** monorepo containing usage examples for `bite-solidity`. Each subdirectory is a thin, scenario-specific workspace member that compiles independently while reusing shared configuration and utilities from the workspace root.
 
 > **Disclaimer:** Code in this `examples/` directory is **not** production-ready and is provided for educational and demonstration purposes only.
+
+## Project structure
+
+```
+examples/
+├── package.json            # workspace root — shared dependencies
+├── hardhat.config.ts       # shared Hardhat config (Solidity, networks, dependency compiler)
+├── tsconfig.json           # shared TypeScript config
+├── scripts/
+│   └── utils.ts            # shared helpers (ECIES decrypt, key derivation)
+├── encrypted-value-registry/
+│   ├── package.json        # name + scripts only (no deps)
+│   ├── hardhat.config.ts   # 2-line re-export of ../hardhat.config
+│   ├── tsconfig.json       # extends ../tsconfig.json
+│   ├── contracts/
+│   └── scripts/
+└── ...
+```
+
+Each example workspace member contains only its own contracts, scripts, and tests. Dependencies, Hardhat settings, and TypeScript configuration are defined once at the workspace root and inherited. This keeps examples minimal and makes future migrations (e.g., Hardhat v2 → v3) a single-point change.
+
+## Getting started
+
+From the `examples/` directory:
+
+```bash
+yarn install          # install all workspace dependencies
+yarn compile          # compile all examples
+```
+
+Or compile a single example:
+
+```bash
+cd encrypted-value-registry
+yarn compile
+```
 
 ## BITE integration flow
 

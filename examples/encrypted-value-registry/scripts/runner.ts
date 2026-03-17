@@ -1,7 +1,7 @@
 // cspell:words ciphertext
-import { ethers, JsonRpcProvider, SigningKey } from "ethers";
-import crypto from "crypto";
+import { ethers, JsonRpcProvider } from "ethers";
 import { BITE } from "@skalenetwork/bite";
+import { decrypt, privateKeyToPublicKey } from "../../scripts/utils";
 
 import dotenv from "dotenv"
 dotenv.config({ quiet: true });
@@ -77,40 +77,13 @@ async function waitForEncryptedValue(
     throw new Error("Timed out waiting for callback to populate encrypted value");
 }
 
-function decrypt(privateKey: string, encryptedHex: string) {
-    const data = Buffer.from(encryptedHex.replace(/^0x/, ""), "hex");
 
-    const iv = data.slice(0, 16);
-    const ephPub = data.slice(16, 49);
-    const ciphertext = data.slice(49);
-
-    const ecdh = crypto.createECDH("secp256k1");
-    ecdh.setPrivateKey(Buffer.from(privateKey.replace(/^0x/, ""), "hex"));
-
-    const sharedSecret = ecdh.computeSecret(ephPub);
-    const key = crypto.createHash("sha256").update(sharedSecret).digest();
-
-    const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
-
-    return Buffer.concat([decipher.update(ciphertext), decipher.final()]);
-}
-
-function derivePublicKey(privateKey: ethers.BytesLike) {
-    const signingKey = new SigningKey(privateKey);
-
-    const publicKey = signingKey.publicKey;
-
-    const x = "0x" + publicKey.slice(4, 68);
-    const y = "0x" + publicKey.slice(68, 132);
-
-    return { x, y };
-}
 
 
 async function grantAccess() {
     const contractWithSigner = contract.connect(wallet) as any;
 
-    const publicKey = derivePublicKey(PRIVATE_KEY);
+    const publicKey = privateKeyToPublicKey(PRIVATE_KEY);
     const owner = await contractWithSigner.owner();
 
     if (owner.toLowerCase() !== wallet.address.toLowerCase()) {

@@ -29,7 +29,7 @@ npm install @skalenetwork/bite-solidity
 
 ## Usage
 
-For detailed usage, integration patterns, and end-to-end examples, see [examples/README.md](examples/README.md).
+For detailed usage, integration patterns, and end-to-end examples, see [examples/README.md](examples/README.md). The examples are organized as a Yarn workspaces monorepo — each example is a thin workspace member that reuses shared Hardhat config, TypeScript config, and script utilities from the workspace root.
 
 > **Disclaimer:** Code under `examples/` is **not** production-ready and is provided for educational and demonstration purposes only.
 

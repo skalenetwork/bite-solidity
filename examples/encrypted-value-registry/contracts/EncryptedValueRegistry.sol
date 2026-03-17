@@ -19,12 +19,10 @@
     along with bite-solidity.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// cspell:words ECIES
-
 pragma solidity ^0.8.24;
 
-import { BITE, PublicKey } from "@skalenetwork/bite-solidity/BITE.sol";
-import { IBiteSupplicant } from "@skalenetwork/bite-solidity/interfaces/IBiteSupplicant.sol";
+import { BITE, PublicKey } from "@skalenetwork/bite-solidity/contracts/BITE.sol";
+import { IBiteSupplicant } from "@skalenetwork/bite-solidity/contracts/interfaces/IBiteSupplicant.sol";
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 

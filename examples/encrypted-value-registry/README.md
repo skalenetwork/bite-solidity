@@ -56,6 +56,8 @@ The viewer calls `getEncryptedValue()`, which returns the bytes stored for `msg.
 
 ## Scripts
 
+Both scripts import shared helpers (`decrypt`, `privateKeyToPublicKey`, `PublicKey`) from `examples/scripts/utils.ts` to avoid duplication across examples.
+
 ### `hardhatRunner.ts` — Hardhat integrated, end-to-end
 
 This script is intended to be run inside a **Hardhat v2 project** with a configured network and signer. It uses `ethers` from `hardhat` and the `@skalenetwork/bite` library and handles the full lifecycle: deploy → set value (encrypted) → grant access (encrypted) → poll for the BITE callback → decrypt → verify.
@@ -72,7 +74,7 @@ This script is intended to be run inside a **Hardhat v2 project** with a configu
 **Run**
 
 ```bash
-PRIVATE_KEY=0x... ENDPOINT=https://... npx hardhat run scripts/hardhatRunner.ts --network <your-bite2-network>
+PRIVATE_KEY=0x... ENDPOINT=https://... yarn hardhat run scripts/hardhatRunner.ts --network custom
 ```
 
 **What it does**
@@ -97,7 +99,7 @@ This script uses **ethers.js** and the `@skalenetwork/bite` library (no Hardhat 
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `PRIVATE_KEY` | yes | — | Deployer/owner private key |
-| `ENDPOINT` | no | `https://base-sepolia-testnet.skalenodes.com/v1/bite-v2-sandbox` | RPC endpoint used both for chain access and BITE transaction encryption |
+| `ENDPOINT` | recommended | `https://base-sepolia-testnet.skalenodes.com/v1/bite-v2-sandbox` | RPC endpoint used both for chain access and BITE transaction encryption |
 | `CONTRACT_ADDRESS` | yes | — | Address of a deployed `EncryptedValueRegistry` |
 
 You can provide them either in your shell, in a local `.env` file, or hardcode them in the script.
