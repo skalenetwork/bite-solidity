@@ -9,7 +9,7 @@
 
 This example demonstrates a contract that stores a confidential `uint256` value on-chain and lets the owner selectively grant read access to specific accounts — without the owner ever being able to view the value themselves, and without the access list being publicly readable.
 
-It exercises three core BITE 2 features together:
+It exercises three core BITE features together:
 
 - **Threshold Encryption (TE):** The value is encrypted at construction time with the network's threshold key. No single party can decrypt it.
 - **Conditional Transaction (CTX):** When access is granted, a CTX is submitted. The BITE network decrypts the TE-encrypted value off-chain and calls back `onDecrypt`.
