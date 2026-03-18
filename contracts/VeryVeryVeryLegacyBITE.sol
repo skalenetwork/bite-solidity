@@ -20,8 +20,6 @@
     along with bite-solidity.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// cspell:words ECIES
-
 // Disable gas-custom-errors because old versions of Solidity don't support custom errors
 // solhint-disable gas-custom-errors
 

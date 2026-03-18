@@ -20,8 +20,6 @@
     along with bite-solidity.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// cspell:words ECIES
-
 pragma solidity >=0.8.27;
 
 import { PublicKey } from "./types.sol";

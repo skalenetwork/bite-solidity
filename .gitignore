@@ -149,3 +149,10 @@ ignition/deployments/chain-31337
 
 # Python files
 /venv
+
+# Examples workspace
+/examples/.yarn/install-state.gz
+/examples/**/artifacts
+/examples/**/cache
+/examples/**/typechain-types
+/examples/**/contracts/hardhat-dependency-compiler

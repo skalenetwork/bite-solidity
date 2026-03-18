@@ -20,8 +20,6 @@
     along with bite-solidity.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// cspell:words ECIES
-
 // This file is developed for using with old solidity versions.abi
 // solhint-disable compiler-version
 
