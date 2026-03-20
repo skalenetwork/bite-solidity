@@ -37,7 +37,7 @@ contract RoleBasedValueRegistry is IBiteSupplicant {
         PublicKey publicKey;
         // The role's secret key, encrypted with ECIES for each user
         mapping(address => bytes) userEncryptedSecret;
-        // The role's secret key, encryted with TE
+        // The role's secret key, encrypted with TE
         bytes encryptedRoleSecret;
         // A secret visible only for users with this role, encrypted with ECIES using the role's public key
         // Contract can hypothetically be changed to store more values or value mapping

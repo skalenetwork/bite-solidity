@@ -130,4 +130,4 @@ The new user sends its entire remaining balance back to the deployer, reserving 
 PRIVATE_KEY=0x... ENDPOINT=https://... yarn hardhat run scripts/deployAndTest.ts --network custom
 ```
 
-> **Note:** If `ADMIN_ROLE_PRIVATE_KEY` or `READER_ROLE_PRIVATE_KEY` are omitted, the script generates new keypairs automatically and logs that they were generated.
+> **Note:** If `ADMIN_ROLE_PRIVATE_KEY` or `READER_ROLE_PRIVATE_KEY` are omitted, the script generates new key-pairs automatically and logs that they were generated.

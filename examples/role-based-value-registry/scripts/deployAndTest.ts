@@ -147,7 +147,7 @@ const main = async () => {
 
     console.log("Success: ADMIN_ROLE was bootstrapped, value was set, and decryption matched.");
 
-    // ── Step 1: Creating a new user, and transfering 0.2 ETH (Credits) ──
+    // ── Step 1: Creating a new user, and transferring 0.2 ETH (Credits) ──
 
     const newUserWallet = Wallet.createRandom().connect(ethers.provider);
     const newUserAddress = newUserWallet.address;
