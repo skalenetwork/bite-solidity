@@ -1,6 +1,6 @@
 // cspell:words ciphertext
 
-import { AbiCoder, Wallet, id } from "ethers";
+import { AbiCoder, Wallet, getCreateAddress, id } from "ethers";
 import { ethers } from "hardhat";
 import { BITE } from "@skalenetwork/bite";
 import { decrypt, privateKeyToPublicKey } from "../../scripts/utils";
@@ -85,8 +85,19 @@ const main = async () => {
     console.log(`Initial callback value: ${callbackValue.toString()}`);
 
     const encodedAdminRoleValue = AbiCoder.defaultAbiCoder().encode(["string"], [adminRoleValue]);
-    const encryptedAdminRoleSecret = await bite.encryptMessage(adminRolePrivateKey);
-    const encryptedAdminRoleValue = await bite.encryptMessage(encodedAdminRoleValue);
+
+    const deploymentNonce = await ethers.provider.getTransactionCount(deployerAddress, "pending");
+
+    // Predict address of contract before deployment so that we can encrypt values
+    const registryAddress = getCreateAddress({
+        from: deployerAddress,
+        nonce: deploymentNonce,
+    });
+
+    console.log(`Predicted registry:  ${registryAddress}`);
+
+    const encryptedAdminRoleSecret = await bite.encryptMessageForCTX(adminRolePrivateKey, registryAddress);
+    const encryptedAdminRoleValue = await bite.encryptMessageForCTX(encodedAdminRoleValue, registryAddress);
 
     const factory = await ethers.getContractFactory("RoleBasedValueRegistry");
     const registry = await factory.connect(deployer).deploy(
@@ -95,12 +106,19 @@ const main = async () => {
         encryptedAdminRoleSecret,
         {
             value: callbackValue,
-            gasLimit: 1_900_000,
+            gasLimit: 2_900_000,
+            nonce: deploymentNonce,
         }
     ) as RoleBasedValueRegistry;
 
     await registry.waitForDeployment();
-    const registryAddress = await registry.getAddress();
+    const deployedRegistryAddress = await registry.getAddress();
+
+    if (deployedRegistryAddress !== registryAddress) {
+        throw new Error(
+            `Predicted registry address ${registryAddress} does not match deployed address ${deployedRegistryAddress}`
+        );
+    }
 
     await verify("RoleBasedValueRegistry", registryAddress);
 
