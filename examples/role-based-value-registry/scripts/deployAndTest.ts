@@ -207,7 +207,7 @@ const main = async () => {
     // It requires a new Public/Private key pair for the role.
 
     const READER_ROLE = id("READER_ROLE");
-    const encryptedReaderRoleSecret = await bite.encryptMessage(readerRolePrivateKey);
+    const encryptedReaderRoleSecret = await bite.encryptMessageForCTX(readerRolePrivateKey, registryAddress);
     const newUserRegistry = registry.connect(newUserWallet) as RoleBasedValueRegistry;
 
     await (await newUserRegistry.createRole(
@@ -245,7 +245,7 @@ const main = async () => {
 
     const readerRoleValue = process.env.READER_ROLE_VALUE || "reader confidential value";
     const encodedReaderRoleValue = AbiCoder.defaultAbiCoder().encode(["string"], [readerRoleValue]);
-    const encryptedReaderRoleValue = await bite.encryptMessage(encodedReaderRoleValue);
+    const encryptedReaderRoleValue = await bite.encryptMessageForCTX(encodedReaderRoleValue, registryAddress);
 
     await (await newUserRegistry.encryptForRole(READER_ROLE, encryptedReaderRoleValue, {
         value: deployedCallbackValue,
