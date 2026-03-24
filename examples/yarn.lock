@@ -1509,6 +1509,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@skalenetwork/bite-solidity-example-encrypted-chat@workspace:encrypted-chat":
+  version: 0.0.0-use.local
+  resolution: "@skalenetwork/bite-solidity-example-encrypted-chat@workspace:encrypted-chat"
+  languageName: unknown
+  linkType: soft
+
 "@skalenetwork/bite-solidity-example-encrypted-value-registry@workspace:encrypted-value-registry":
   version: 0.0.0-use.local
   resolution: "@skalenetwork/bite-solidity-example-encrypted-value-registry@workspace:encrypted-value-registry"
