@@ -73,6 +73,7 @@ contract RoleBasedValueRegistry is IBiteSupplicant {
         // the encrypted value's integrity before storing it
         _createRole(ADMIN_ROLE, adminRolePublicKey, encryptedAdminRoleSecret);
         require(_pubKeyToAddress(adminPublicKey) == msg.sender, PubKeyMustMatchSender());
+        // Created CTX
         _grantRole(ADMIN_ROLE, adminPublicKey);
     }
 
@@ -83,7 +84,7 @@ contract RoleBasedValueRegistry is IBiteSupplicant {
         _canCallOnDecrypt[msg.sender] = false;
 
         if(decryptedArgs.length == 1 && plaintextArgs.length == 2) {
-            _handleCreateRoleCallback(decryptedArgs, plaintextArgs);
+            _handleGrantRoleCallback(decryptedArgs, plaintextArgs);
             return;
         }
         else if(decryptedArgs.length == 1 && plaintextArgs.length == 1) {
@@ -146,7 +147,7 @@ contract RoleBasedValueRegistry is IBiteSupplicant {
         emit RoleValueChanged(roleId, previousEncryptedValue, role.encryptedValue);
     }
 
-    function _handleCreateRoleCallback(bytes[] memory encryptedArgs, bytes[] memory plaintextArgs) private {
+    function _handleGrantRoleCallback(bytes[] memory decryptedArgs, bytes[] memory plaintextArgs) private {
         bytes32 roleId = abi.decode(plaintextArgs[0], (bytes32));
         PublicKey memory userPublicKey = abi.decode(plaintextArgs[1], (PublicKey));
         Role storage role = _getRole(roleId);
@@ -154,7 +155,7 @@ contract RoleBasedValueRegistry is IBiteSupplicant {
         require(!_hasRole(roleId, user), UserAlreadyHasRole());
         role.userEncryptedSecret[user] = BITE.encryptECIES(
             BITE.ENCRYPT_ECIES_ADDRESS,
-            encryptedArgs[0],
+            decryptedArgs[0], // Already encoded Off-chain
             userPublicKey
         );
     }
