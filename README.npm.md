@@ -9,7 +9,7 @@ Solidity helpers to interact with BITE protocol features on SKALE networks. It e
 ```solidity
 // SPDX-License-Identifier: AGPL-3.0-only
 
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.26;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { BITE } from "@skalenetwork/bite-solidity/BITE.sol";
