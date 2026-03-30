@@ -109,6 +109,8 @@ Participants can then read the stored ciphertexts from `messages[messageId]` and
 
 A minimal Next.js web app lives in `demo/` and provides a side-by-side chat interface for two server-managed demo accounts. No browser wallet is required — the server signs all transactions using private keys from `.env`.
 
+*NOTE*: The current Demo app does not correctly handle sending too long messages, as the CTX will run out of gas. To support those, either increase the msgGas in the smart-contract (paying more for small messages even), or add the ability to send a custom amount for callback execution. Out of scope for the demo.
+
 ### Prerequisites
 
 - Node.js >= 18
