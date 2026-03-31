@@ -15,7 +15,7 @@ It exercises three core BITE features together:
 - **Conditional Transaction (CTX):** Session creation and message sending both submit CTXs. The BITE network decrypts the encrypted inputs off-chain and calls back `onDecrypt`.
 - **ECIES:** Inside the callback, the decrypted session secret is re-encrypted for each participant's secp256k1 public key, and decrypted message contents are re-encrypted with the session public key before being stored.
 
-*NOTE*: Users of this or simmilar contracts must be aware of the fact that messages submited to the blockchain, even if encrypted, are not guaranteed lifetime secrecy. Issues like user-leaked secrets, dApps wrong doing, advancements in computing power or decryption algorythms, and possibly other external factors may compromise encrypted data.
+*NOTE*: Users of this or similar contracts must be aware of the fact that messages submitted to the blockchain, even if encrypted, are not guaranteed lifetime secrecy. Issues like user-leaked secrets, dApps wrong doing, advancements in computing power or decryption algorithms, and possibly other external factors may compromise encrypted data.
 
 ## How it works
 
@@ -130,7 +130,7 @@ npm install
 | Variable | Description |
 |---|---|
 | `RPC_URL` | JSON-RPC endpoint for the target chain |
-| `BITE_ENDPOINT` | BITE threshold encryption endpoint (usualy the same as RPC_URL) |
+| `BITE_ENDPOINT` | BITE threshold encryption endpoint (usually the same as RPC_URL) |
 | `CONTRACT_ADDRESS` | Deployed EncryptedMessenger address |
 | `USER1_PRIVATE_KEY` | Private key for demo User 1 |
 | `USER2_PRIVATE_KEY` | Private key for demo User 2 |

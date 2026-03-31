@@ -1,3 +1,4 @@
+// cspell:words ciphertext
 // Server-only crypto helpers — adapted from examples/scripts/utils.ts
 // Uses Node.js crypto (runs only in Next.js server context)
 
