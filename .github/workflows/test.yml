@@ -54,7 +54,7 @@ jobs:
       run: yarn
 
     - name: Remove too old solc files
-      run: rm contracts/VeryVeryVeryVeryLegacyBITE.sol && rm contracts/LegacyTypes.sol
+      run: rm contracts/VeryVeryVeryVeryLegacyBITE.sol && rm contracts/LegacyTypes.sol && rm contracts/VeryLegacyErrors.sol
 
     - name: Compile
       env:

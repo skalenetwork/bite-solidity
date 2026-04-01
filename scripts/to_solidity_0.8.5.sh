@@ -8,3 +8,4 @@ rm -r contracts/test
 rm contracts/BITE.sol
 rm contracts/VeryVeryVeryVeryLegacyBITE.sol
 rm contracts/LegacyTypes.sol
+rm contracts/VeryLegacyErrors.sol

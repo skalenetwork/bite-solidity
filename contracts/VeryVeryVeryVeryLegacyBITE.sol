@@ -27,6 +27,7 @@ pragma solidity >=0.5.0 <0.6.0;
 pragma experimental ABIEncoderV2;
 
 import { Types } from "./LegacyTypes.sol";
+import { VeryLegacyErrors } from "./VeryLegacyErrors.sol";
 
 /**
  * @title BITE Library
@@ -72,8 +73,10 @@ library BITE {
         internal
         returns (address payable callbackSender)
     {
-        bytes memory addressBytes = _callPrecompiled(
-            submitCTXAddress,
+        // Have to use low-level calls
+        // because it's the only way to call precompiled contracts
+        // slither-disable-next-line low-level-calls
+        (bool result, bytes memory output) = submitCTXAddress.call( // solhint-disable-line avoid-low-level-calls
             abi.encode(
                 gasLimit,
                 abi.encode(
@@ -82,8 +85,13 @@ library BITE {
                 )
             )
         );
-        require(addressBytes.length == 20, "Incorrect return data length");
-        callbackSender = address(_toBytes20(addressBytes));
+
+        if (!result) {
+            VeryLegacyErrors.handleCTXPrecompileError(output);
+        }
+
+        require(output.length == 20, "Incorrect return data length");
+        callbackSender = address(_toBytes20(output));
         // The system precompiled contract is called.
         // It's trusted and doesn't perform any external calls,
         // so reentrancy is not an issue here.
@@ -96,15 +104,23 @@ library BITE {
     /// @param text The plaintext data to encrypt
     /// @return cipherText The encrypted data returned by the precompiled contract
     function encryptTE(address encryptTEaddress, bytes memory text) internal view returns (bytes memory cipherText) {
-        cipherText = _staticcallPrecompiled(
-            encryptTEaddress,
-            abi.encode(text)
-        );
-        require(cipherText.length != 0, "Empty return data");
+        // Have to use low-level calls
+        // because it's the only way to call precompiled contracts
+        // slither-disable-next-line low-level-calls
+        (
+            bool success,
+            bytes memory output
+        ) = encryptTEaddress.staticcall(abi.encode(text)); // solhint-disable-line avoid-low-level-calls
+
+        if(!success) {
+            VeryLegacyErrors.handleTEPrecompileError(output);
+        }
+        require(output.length != 0, "Empty return data");
         require(
-            cipherText.length > TE_RETURN_SIZE_THRESHOLD,
+            output.length > TE_RETURN_SIZE_THRESHOLD,
             "Invalid return data size"
         );
+        return output;
     }
 
     /// @notice Calls the EncryptECIES precompiled contract
@@ -121,64 +137,26 @@ library BITE {
         view
         returns (bytes memory cipherText)
     {
-        cipherText = _staticcallPrecompiled(
-            encryptECIESaddress,
+        // Have to use low-level calls
+        // because it's the only way to call precompiled contracts
+        // slither-disable-next-line low-level-calls
+        (bool success, bytes memory output) = encryptECIESaddress.staticcall(
             abi.encode(
                 text,
                 publicKey.x,
                 publicKey.y
             )
-        );
-        require(cipherText.length != 0, "Empty return data");
+        ); // solhint-disable-line avoid-low-level-calls
+
+        if(!success) {
+            VeryLegacyErrors.handleECIESPrecompileError(output);
+        }
+        require(output.length != 0, "Empty return data");
         require(
-            cipherText.length > ECIES_RETURN_SIZE_THRESHOLD,
+            output.length > ECIES_RETURN_SIZE_THRESHOLD,
             "Invalid return data size"
         );
-    }
-
-    // Private
-
-    /**
-     * @notice Calls a precompiled contract with the given input
-     * @param precompiledContract The address of the precompiled contract
-     * @param input The input data to pass to the precompiled contract
-     * @return output The output data from the precompiled contract
-     */
-    function _callPrecompiled(
-        address precompiledContract,
-        bytes memory input
-    )
-        private
-        returns (bytes memory output)
-    {
-        // Have to use low-level calls
-        // because it's the only way to call precompiled contracts
-        // slither-disable-next-line low-level-calls
-        (
-            bool success,
-            bytes memory out
-        ) = precompiledContract.call(input); // solhint-disable-line avoid-low-level-calls
-        require(success, "Precompiled call failed");
-        return out;
-    }
-
-    function _staticcallPrecompiled(
-        address precompiledContract,
-        bytes memory input
-    )
-        private
-        view
-        returns (bytes memory output)
-    {
-        // Have to use low-level calls
-        // because it's the only way to call precompiled contracts
-        // slither-disable-next-line low-level-calls
-        (
-            bool success,
-            bytes memory out
-        ) = precompiledContract.staticcall(input); // solhint-disable-line avoid-low-level-calls
-        require(success, "Precompiled call failed");
-        return out;
+        return output;
     }
 
     function _toBytes20(bytes memory data) private pure returns (bytes20 data_) {

@@ -25,6 +25,7 @@
 
 pragma solidity >=0.8.5;
 
+import { Errors } from "./Errors.sol";
 import { PublicKey } from "./types.sol";
 
 /**
@@ -56,7 +57,6 @@ library BITE {
     /// @param callbackSender The address that will send the callback
     event CTXSubmitted(address indexed callbackSender);
 
-    error PrecompiledCallFailed(address precompiledContract);
     error EmptyReturnData(address precompiledContract);
     error IncorrectReturnDataLength(address precompiledContract, uint256 expected, uint256 actual);
     error InvalidReturnDataSize(address precompiledContract, uint256 expectedMin, uint256 actual);
@@ -77,8 +77,10 @@ library BITE {
         internal
         returns (address payable callbackSender)
     {
-        bytes memory addressBytes = _callPrecompiled(
-            submitCTXAddress,
+        // Have to use low-level calls
+        // because it's the only way to call precompiled contracts
+        // slither-disable-next-line low-level-calls
+        (bool result, bytes memory output) = submitCTXAddress.call( // solhint-disable-line avoid-low-level-calls
             abi.encode(
                 gasLimit,
                 abi.encode(
@@ -87,10 +89,15 @@ library BITE {
                 )
             )
         );
-        if(addressBytes.length != 20) {
-            revert IncorrectReturnDataLength(submitCTXAddress, 20, addressBytes.length);
+
+        if (!result) {
+            Errors.handleCTXPrecompileError(output);
         }
-        callbackSender = payable(address(bytes20(addressBytes)));
+
+        if(output.length != 20) {
+            revert IncorrectReturnDataLength(submitCTXAddress, 20, output.length);
+        }
+        callbackSender = payable(address(bytes20(output)));
         // The system precompiled contract is called.
         // It's trusted and doesn't perform any external calls,
         // so reentrancy is not an issue here.
@@ -103,17 +110,24 @@ library BITE {
     /// @param text The plaintext data to encrypt
     /// @return cipherText The encrypted data returned by the precompiled contract
     function encryptTE(address encryptTEaddress, bytes memory text) internal view returns (bytes memory cipherText) {
-        cipherText = _staticcallPrecompiled(
-            encryptTEaddress,
-            abi.encode(text)
-        );
-        if (cipherText.length > TE_RETURN_SIZE_THRESHOLD) {
-            return cipherText;
+        // Have to use low-level calls
+        // because it's the only way to call precompiled contracts
+        // slither-disable-next-line low-level-calls
+        (
+            bool success,
+            bytes memory output
+        ) = encryptTEaddress.staticcall(abi.encode(text)); // solhint-disable-line avoid-low-level-calls
+
+        if(!success) {
+            Errors.handleTEPrecompileError(output);
         }
-        if (cipherText.length == 0) {
+        if (output.length == 0) {
             revert EmptyReturnData(encryptTEaddress);
         }
-        revert InvalidReturnDataSize(encryptTEaddress, TE_RETURN_SIZE_THRESHOLD + 1, cipherText.length);
+        if (output.length < TE_RETURN_SIZE_THRESHOLD + 1) {
+            revert InvalidReturnDataSize(encryptTEaddress, TE_RETURN_SIZE_THRESHOLD + 1, output.length);
+        }
+        return output;
     }
 
     /// @notice Calls the EncryptECIES precompiled contract
@@ -130,75 +144,27 @@ library BITE {
         view
         returns (bytes memory cipherText)
     {
-        cipherText = _staticcallPrecompiled(
-            encryptECIESaddress,
+        // Have to use low-level calls
+        // because it's the only way to call precompiled contracts
+        // slither-disable-next-line low-level-calls
+        (bool success, bytes memory output) = encryptECIESaddress.staticcall(
             abi.encode(
                 text,
                 publicKey.x,
                 publicKey.y
             )
-        );
-        if (cipherText.length > ECIES_RETURN_SIZE_THRESHOLD) {
-            return cipherText;
+        ); // solhint-disable-line avoid-low-level-calls
+
+        if(!success) {
+            Errors.handleECIESPrecompileError(output);
         }
-        if (cipherText.length == 0) {
+        if (output.length == 0) {
             revert EmptyReturnData(encryptECIESaddress);
         }
-        revert InvalidReturnDataSize(encryptECIESaddress, ECIES_RETURN_SIZE_THRESHOLD + 1, cipherText.length);
-    }
-
-    // Private
-
-    /**
-     * @notice Calls a precompiled contract with the given input
-     * @param precompiledContract The address of the precompiled contract
-     * @param input The input data to pass to the precompiled contract
-     * @return output The output data from the precompiled contract
-     */
-    function _callPrecompiled(
-        address precompiledContract,
-        bytes memory input
-    )
-        private
-        returns (bytes memory output)
-    {
-        // Have to use low-level calls
-        // because it's the only way to call precompiled contracts
-        // slither-disable-next-line low-level-calls
-        (
-            bool success,
-            bytes memory out
-        ) = precompiledContract.call(input); // solhint-disable-line avoid-low-level-calls
-        if (!success) {
-            revert PrecompiledCallFailed(precompiledContract);
+        if (output.length < ECIES_RETURN_SIZE_THRESHOLD + 1) {
+            revert InvalidReturnDataSize(encryptECIESaddress, ECIES_RETURN_SIZE_THRESHOLD + 1, output.length);
         }
-        return out;
+        return output;
     }
 
-    /**
-     * @notice Calls a precompiled contract using staticcall
-     * @param precompiledContract The address of the precompiled contract
-     * @param input The input data to pass to the precompiled contract
-     * @return output The output data from the precompiled contract
-     */
-    function _staticcallPrecompiled(
-        address precompiledContract,
-        bytes memory input
-    )
-        private
-        view
-        returns (bytes memory output)
-    {
-        // Have to use low-level calls
-        // because it's the only way to call precompiled contracts
-        // slither-disable-next-line low-level-calls
-        (
-            bool success,
-            bytes memory out
-        ) = precompiledContract.staticcall(input); // solhint-disable-line avoid-low-level-calls
-        if (!success) {
-            revert PrecompiledCallFailed(precompiledContract);
-        }
-        return out;
-    }
 }

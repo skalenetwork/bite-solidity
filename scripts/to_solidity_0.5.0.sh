@@ -11,3 +11,4 @@ rm contracts/types.sol
 
 git checkout -- contracts/VeryVeryVeryVeryLegacyBITE.sol
 git checkout -- contracts/LegacyTypes.sol
+git checkout -- contracts/VeryLegacyErrors.sol
