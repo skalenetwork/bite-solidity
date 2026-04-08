@@ -77,9 +77,6 @@ library BITE {
         internal
         returns (address payable callbackSender)
     {
-        // Have to use low-level calls
-        // because it's the only way to call precompiled contracts
-        // slither-disable-next-line low-level-calls
         bytes memory addressBytes = _callPrecompiled(
             submitCTXAddress,
             abi.encode(gasLimit, abi.encode(encryptedArguments, plaintextArguments)),
@@ -102,9 +99,6 @@ library BITE {
     /// @param text The plaintext data to encrypt
     /// @return cipherText The encrypted data returned by the precompiled contract
     function encryptTE(address encryptTEaddress, bytes memory text) internal view returns (bytes memory cipherText) {
-        // Have to use low-level calls
-        // because it's the only way to call precompiled contracts
-        // slither-disable-next-line low-level-calls
         cipherText = _staticcallPrecompiled(
             encryptTEaddress,
             abi.encode(text),
@@ -132,9 +126,6 @@ library BITE {
         view
         returns (bytes memory cipherText)
     {
-        // Have to use low-level calls
-        // because it's the only way to call precompiled contracts
-        // slither-disable-next-line low-level-calls
         cipherText = _staticcallPrecompiled(
             encryptECIESaddress,
             abi.encode(text, publicKey.x, publicKey.y),
@@ -148,36 +139,62 @@ library BITE {
         }
     }
 
+    /**
+     * @notice Calls a precompiled contract with the given input
+     * @param precompiledContract The address of the precompiled contract
+     * @param input The input data to pass to the precompiled contract
+     * @param errorHandler Function to handle callback errors
+     * @return output The output data from the precompiled contract
+     */
     function _callPrecompiled(
-        address precompiledAddress,
-        bytes memory data,
+        address precompiledContract,
+        bytes memory input,
         function(bytes memory) internal pure errorHandler
-    ) private returns (bytes memory output) {
+    )
+        private
+        returns (bytes memory output)
+    {
         // Have to use low-level calls
         // because it's the only way to call precompiled contracts
         // slither-disable-next-line low-level-calls
-        (bool success, bytes memory dataOut) =
-            precompiledAddress.call(data); // solhint-disable-line avoid-low-level-calls
-        if(!success) {
-            errorHandler(dataOut);
+        (
+            bool success,
+            bytes memory out
+        ) = precompiledContract.call(input); // solhint-disable-line avoid-low-level-calls
+        if (!success) {
+            errorHandler(out);
         }
-        return dataOut;
+        return out;
     }
 
+    /**
+     * @notice Calls a precompiled contract using staticcall
+     * @param precompiledContract The address of the precompiled contract
+     * @param input The input data to pass to the precompiled contract
+     * @param errorHandler Function to handle callback errors
+     * @return output The output data from the precompiled contract
+     */
     function _staticcallPrecompiled(
-        address precompiledAddress,
-        bytes memory data,
+        address precompiledContract,
+        bytes memory input,
         function(bytes memory) internal pure errorHandler
-    ) private view returns (bytes memory output) {
+    )
+        private
+        view
+        returns (bytes memory output)
+    {
         // Have to use low-level calls
         // because it's the only way to call precompiled contracts
         // slither-disable-next-line low-level-calls
-        (bool success, bytes memory dataOut) =
-            precompiledAddress.staticcall(data); // solhint-disable-line avoid-low-level-calls
-        if(!success) {
-            errorHandler(dataOut);
+        (
+            bool success,
+            bytes memory out
+        ) = precompiledContract.staticcall(input); // solhint-disable-line avoid-low-level-calls
+
+        if (!success) {
+            errorHandler(out);
         }
-        return dataOut;
+        return out;
     }
 
     function _toBytes20(bytes memory data) private pure returns (bytes20 data_) {
