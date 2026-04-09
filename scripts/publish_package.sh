@@ -29,7 +29,7 @@ fi
 echo "Using $VERSION as a new version"
 
 cp LICENSE contracts
-cp README.npm.md contracts
+cp README.npm.md contracts/README.md
 cp package.json contracts
 
 cd contracts
