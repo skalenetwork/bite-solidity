@@ -23,17 +23,32 @@
 // This file is developed for using with old solidity versions.abi
 // solhint-disable compiler-version
 
+// They are libraries, and small enough not to justify multiple files for each
+// solhint-disable one-contract-per-file
+
 pragma solidity >=0.8.4;
 
 /// @title Errors Library
 /// @author Eduardo Vasques
 /// @author Dmytro Stebaiev
-/// @notice Custom errors and handlers for BITE precompiles
+/// @notice General errors and handlers
 library Errors {
 
     // Common
     error UnknownError(bytes errorData);
 
+    function decodeError(bytes memory output) internal pure returns (uint256 errorCode) {
+        if (output.length != 32) {
+            revert UnknownError(output);
+        }
+        return abi.decode(output, (uint256));
+    }
+}
+
+/// @title CTX Errors Library
+/// @author Eduardo Vasques
+/// @notice CTX errors and handlers
+library SubmitCTXErrors {
     // CTX Precompile
     error CTXInputTooShort(uint256 errorCode);                // 2
     error CTXInvalidDestination(uint256 errorCode);           // 3
@@ -47,27 +62,10 @@ library Errors {
     error CTXCountNotVerifyTransaction(uint256 errorCode);    // 11
     error CTXUnknownError(uint256 errorCode);                 // --
 
-    // Encrypt Precompiles common
-
-    error UnknownEncryptionError(uint256 errorCode);          // 0 or possibly others
-    error InputTooLarge(uint256 errorCode);                   // 1
-    error InputTooShort(uint256 errorCode);                   // 2
-    error InputNot32ByteAligned(uint256 errorCode);           // 3
-    error InvalidDataOffset(uint256 errorCode);               // 4
-    error DataLengthMismatch(uint256 errorCode);              // 5
-    error TrailingPaddingNotZeros(uint256 errorCode);         // 6
-
-    // ECIES Precompile
-
-    error ECIESInvalidPublicKey(uint256 errorCode);           // 7
-    error ECIESEncryptionFailed(uint256 errorCode);           // 8
-
-    // Error handler functions
-
     // Cost/benefit here of using this pattern is worth the ignore
     /* solhint-disable code-complexity */
-    function handleCTXPrecompileError(bytes memory output) internal pure {
-        uint256 errorCode = _decodeError(output);
+    function handle(bytes memory output) internal pure {
+        uint256 errorCode = Errors.decodeError(output);
 
         if (errorCode == 2) revert CTXInputTooShort(errorCode);
         if (errorCode == 3) revert CTXInvalidDestination(errorCode);
@@ -83,40 +81,65 @@ library Errors {
         revert CTXUnknownError(errorCode);
     }
     /* solhint-enable code-complexity */
+}
 
-    function handleECIESPrecompileError(bytes memory output) internal pure {
-        uint256 errorCode = _decodeError(output);
+/// @title Encrypt Errors Library
+/// @author Eduardo Vasques
+/// @notice Common encryption errors and handlers
+library EncryptErrors {
+    // Encrypt Precompiles common
 
-        _handleEncryptPrecompileError(errorCode);
-        if (errorCode == 7) revert ECIESInvalidPublicKey(errorCode);
-        else if (errorCode == 8) revert ECIESEncryptionFailed(errorCode);
+    error UnknownEncryptionError(uint256 errorCode);          // 0 or possibly others
+    error InputTooLarge(uint256 errorCode);                   // 1
+    error InputTooShort(uint256 errorCode);                   // 2
+    error InputNot32ByteAligned(uint256 errorCode);           // 3
+    error InvalidDataOffset(uint256 errorCode);               // 4
+    error DataLengthMismatch(uint256 errorCode);              // 5
+    error TrailingPaddingNotZeros(uint256 errorCode);         // 6
 
-        revert UnknownEncryptionError(errorCode);
-    }
 
-    function handleTEPrecompileError(bytes memory output) internal pure {
-        uint256 errorCode = _decodeError(output);
-
-        _handleEncryptPrecompileError(errorCode);
-
-        revert UnknownEncryptionError(errorCode);
-    }
-
-    // Private
-
-    function _decodeError(bytes memory output) private pure returns (uint256 errorCode) {
-        if (output.length != 32) {
-            revert UnknownError(output);
-        }
-        return abi.decode(output, (uint256));
-    }
-
-    function _handleEncryptPrecompileError(uint256 errorCode) private pure {
+    function handle(uint256 errorCode) internal pure {
         if (errorCode == 1) revert InputTooLarge(errorCode);
         else if (errorCode == 2) revert InputTooShort(errorCode);
         else if (errorCode == 3) revert InputNot32ByteAligned(errorCode);
         else if (errorCode == 4) revert InvalidDataOffset(errorCode);
         else if (errorCode == 5) revert DataLengthMismatch(errorCode);
         else if (errorCode == 6) revert TrailingPaddingNotZeros(errorCode);
+    }
+}
+
+/// @title ECIES Errors Library
+/// @author Eduardo Vasques
+/// @notice ECIES encryption errors and handlers
+library EncryptECIESErrors {
+    // ECIES Precompile
+
+    error ECIESInvalidPublicKey(uint256 errorCode);           // 7
+    error ECIESEncryptionFailed(uint256 errorCode);           // 8
+
+    // Error handler functions
+
+    function handle(bytes memory output) internal pure {
+        uint256 errorCode = Errors.decodeError(output);
+
+        EncryptErrors.handle(errorCode);
+        if (errorCode == 7) revert ECIESInvalidPublicKey(errorCode);
+        else if (errorCode == 8) revert ECIESEncryptionFailed(errorCode);
+
+        revert EncryptErrors.UnknownEncryptionError(errorCode);
+    }
+}
+
+/// @title TE Errors Library
+/// @author Eduardo Vasques
+/// @notice TE encryption errors and handlers
+library EncryptTEErrors {
+
+    function handle(bytes memory output) internal pure {
+        uint256 errorCode = Errors.decodeError(output);
+
+        EncryptErrors.handle(errorCode);
+
+        revert EncryptErrors.UnknownEncryptionError(errorCode);
     }
 }

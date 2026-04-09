@@ -25,7 +25,7 @@
 
 pragma solidity >=0.8.5;
 
-import { Errors } from "./Errors.sol";
+import { SubmitCTXErrors, EncryptECIESErrors, EncryptTEErrors } from "./Errors.sol";
 import { PublicKey } from "./types.sol";
 
 /**
@@ -80,7 +80,7 @@ library BITE {
         bytes memory addressBytes = _callPrecompiled(
             submitCTXAddress,
             abi.encode(gasLimit, abi.encode(encryptedArguments, plaintextArguments)),
-            Errors.handleCTXPrecompileError
+            SubmitCTXErrors.handle
         );
 
         if(addressBytes.length != 20) {
@@ -102,7 +102,7 @@ library BITE {
         cipherText = _staticcallPrecompiled(
             encryptTEaddress,
             abi.encode(text),
-            Errors.handleTEPrecompileError
+            EncryptTEErrors.handle
         );
         if (cipherText.length == 0) {
             revert EmptyReturnData(encryptTEaddress);
@@ -130,7 +130,7 @@ library BITE {
         cipherText = _staticcallPrecompiled(
             encryptECIESaddress,
             abi.encode(text, publicKey.x, publicKey.y),
-            Errors.handleECIESPrecompileError
+            EncryptECIESErrors.handle
         );
         if (cipherText.length == 0) {
             revert EmptyReturnData(encryptECIESaddress);
