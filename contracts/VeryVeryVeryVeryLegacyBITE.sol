@@ -75,7 +75,10 @@ library BITE {
     {
         bytes memory addressBytes = _callPrecompiled(
             submitCTXAddress,
-            abi.encode(gasLimit, abi.encode(encryptedArguments, plaintextArguments)),
+            abi.encode(
+                gasLimit,
+                abi.encode(encryptedArguments, plaintextArguments)
+            ),
             VeryLegacyErrors.handleCTXPrecompileError
         );
 
