@@ -25,6 +25,7 @@
 
 pragma solidity >=0.8.5;
 
+import { SubmitCTXErrors, EncryptECIESErrors, EncryptTEErrors } from "./Errors.sol";
 import { PublicKey } from "./types.sol";
 
 /**
@@ -56,7 +57,6 @@ library BITE {
     /// @param callbackSender The address that will send the callback
     event CTXSubmitted(address indexed callbackSender);
 
-    error PrecompiledCallFailed(address precompiledContract);
     error EmptyReturnData(address precompiledContract);
     error IncorrectReturnDataLength(address precompiledContract, uint256 expected, uint256 actual);
     error InvalidReturnDataSize(address precompiledContract, uint256 expectedMin, uint256 actual);
@@ -81,12 +81,11 @@ library BITE {
             submitCTXAddress,
             abi.encode(
                 gasLimit,
-                abi.encode(
-                    encryptedArguments,
-                    plaintextArguments
-                )
-            )
+                abi.encode(encryptedArguments, plaintextArguments)
+            ),
+            SubmitCTXErrors.handle
         );
+
         if(addressBytes.length != 20) {
             revert IncorrectReturnDataLength(submitCTXAddress, 20, addressBytes.length);
         }
@@ -105,15 +104,16 @@ library BITE {
     function encryptTE(address encryptTEaddress, bytes memory text) internal view returns (bytes memory cipherText) {
         cipherText = _staticcallPrecompiled(
             encryptTEaddress,
-            abi.encode(text)
+            abi.encode(text),
+            EncryptTEErrors.handle
         );
-        if (cipherText.length > TE_RETURN_SIZE_THRESHOLD) {
-            return cipherText;
-        }
         if (cipherText.length == 0) {
             revert EmptyReturnData(encryptTEaddress);
         }
-        revert InvalidReturnDataSize(encryptTEaddress, TE_RETURN_SIZE_THRESHOLD + 1, cipherText.length);
+        if (cipherText.length < TE_RETURN_SIZE_THRESHOLD + 1) {
+            revert InvalidReturnDataSize(encryptTEaddress, TE_RETURN_SIZE_THRESHOLD + 1, cipherText.length);
+        }
+        return cipherText;
     }
 
     /// @notice Calls the EncryptECIES precompiled contract
@@ -132,32 +132,29 @@ library BITE {
     {
         cipherText = _staticcallPrecompiled(
             encryptECIESaddress,
-            abi.encode(
-                text,
-                publicKey.x,
-                publicKey.y
-            )
+            abi.encode(text, publicKey.x, publicKey.y),
+            EncryptECIESErrors.handle
         );
-        if (cipherText.length > ECIES_RETURN_SIZE_THRESHOLD) {
-            return cipherText;
-        }
         if (cipherText.length == 0) {
             revert EmptyReturnData(encryptECIESaddress);
         }
-        revert InvalidReturnDataSize(encryptECIESaddress, ECIES_RETURN_SIZE_THRESHOLD + 1, cipherText.length);
+        if (cipherText.length < ECIES_RETURN_SIZE_THRESHOLD + 1) {
+            revert InvalidReturnDataSize(encryptECIESaddress, ECIES_RETURN_SIZE_THRESHOLD + 1, cipherText.length);
+        }
+        return cipherText;
     }
-
-    // Private
 
     /**
      * @notice Calls a precompiled contract with the given input
      * @param precompiledContract The address of the precompiled contract
      * @param input The input data to pass to the precompiled contract
+     * @param errorHandler Function to handle callback errors
      * @return output The output data from the precompiled contract
      */
     function _callPrecompiled(
         address precompiledContract,
-        bytes memory input
+        bytes memory input,
+        function(bytes memory) internal pure errorHandler
     )
         private
         returns (bytes memory output)
@@ -170,20 +167,23 @@ library BITE {
             bytes memory out
         ) = precompiledContract.call(input); // solhint-disable-line avoid-low-level-calls
         if (!success) {
-            revert PrecompiledCallFailed(precompiledContract);
+            errorHandler(out);
         }
         return out;
     }
+
 
     /**
      * @notice Calls a precompiled contract using staticcall
      * @param precompiledContract The address of the precompiled contract
      * @param input The input data to pass to the precompiled contract
+     * @param errorHandler Function to handle callback errors
      * @return output The output data from the precompiled contract
      */
     function _staticcallPrecompiled(
         address precompiledContract,
-        bytes memory input
+        bytes memory input,
+        function(bytes memory) internal pure errorHandler
     )
         private
         view
@@ -196,9 +196,11 @@ library BITE {
             bool success,
             bytes memory out
         ) = precompiledContract.staticcall(input); // solhint-disable-line avoid-low-level-calls
+
         if (!success) {
-            revert PrecompiledCallFailed(precompiledContract);
+            errorHandler(out);
         }
         return out;
     }
+
 }

@@ -22,7 +22,6 @@
 pragma solidity >=0.8.27;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
-import { ZeroAddress } from "../errors.sol";
 import { IBiteSupplicant } from "../interfaces/IBiteSupplicant.sol";
 
 
@@ -69,6 +68,7 @@ contract CallbackSender is ICallbackSender{
     event AddressFunded(address indexed sender, uint256 indexed amount);
 
     error InsufficientEth(uint256 required, uint256 available);
+    error ZeroAddress();
 
     /// @notice Constructor for the CallbackSender contract
     /// @param supplicant Address of the supplicant contract

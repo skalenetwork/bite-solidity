@@ -27,6 +27,7 @@ pragma solidity >=0.5.0 <0.6.0;
 pragma experimental ABIEncoderV2;
 
 import { Types } from "./LegacyTypes.sol";
+import { VeryLegacyErrors } from "./VeryLegacyErrors.sol";
 
 /**
  * @title BITE Library
@@ -76,12 +77,11 @@ library BITE {
             submitCTXAddress,
             abi.encode(
                 gasLimit,
-                abi.encode(
-                    encryptedArguments,
-                    plaintextArguments
-                )
-            )
+                abi.encode(encryptedArguments, plaintextArguments)
+            ),
+            VeryLegacyErrors.handleCTXPrecompileError
         );
+
         require(addressBytes.length == 20, "Incorrect return data length");
         callbackSender = address(_toBytes20(addressBytes));
         // The system precompiled contract is called.
@@ -98,7 +98,8 @@ library BITE {
     function encryptTE(address encryptTEaddress, bytes memory text) internal view returns (bytes memory cipherText) {
         cipherText = _staticcallPrecompiled(
             encryptTEaddress,
-            abi.encode(text)
+            abi.encode(text),
+            VeryLegacyErrors.handleTEPrecompileError
         );
         require(cipherText.length != 0, "Empty return data");
         require(
@@ -123,30 +124,28 @@ library BITE {
     {
         cipherText = _staticcallPrecompiled(
             encryptECIESaddress,
-            abi.encode(
-                text,
-                publicKey.x,
-                publicKey.y
-            )
+            abi.encode(text, publicKey.x, publicKey.y),
+            VeryLegacyErrors.handleECIESPrecompileError
         );
         require(cipherText.length != 0, "Empty return data");
         require(
             cipherText.length > ECIES_RETURN_SIZE_THRESHOLD,
             "Invalid return data size"
         );
+        return cipherText;
     }
-
-    // Private
 
     /**
      * @notice Calls a precompiled contract with the given input
      * @param precompiledContract The address of the precompiled contract
      * @param input The input data to pass to the precompiled contract
+     * @param errorHandler Function to handle callback errors
      * @return output The output data from the precompiled contract
      */
     function _callPrecompiled(
         address precompiledContract,
-        bytes memory input
+        bytes memory input,
+        function(bytes memory) internal pure errorHandler
     )
         private
         returns (bytes memory output)
@@ -158,13 +157,23 @@ library BITE {
             bool success,
             bytes memory out
         ) = precompiledContract.call(input); // solhint-disable-line avoid-low-level-calls
-        require(success, "Precompiled call failed");
+        if (!success) {
+            errorHandler(out);
+        }
         return out;
     }
 
+    /**
+     * @notice Calls a precompiled contract using staticcall
+     * @param precompiledContract The address of the precompiled contract
+     * @param input The input data to pass to the precompiled contract
+     * @param errorHandler Function to handle callback errors
+     * @return output The output data from the precompiled contract
+     */
     function _staticcallPrecompiled(
         address precompiledContract,
-        bytes memory input
+        bytes memory input,
+        function(bytes memory) internal pure errorHandler
     )
         private
         view
@@ -177,7 +186,10 @@ library BITE {
             bool success,
             bytes memory out
         ) = precompiledContract.staticcall(input); // solhint-disable-line avoid-low-level-calls
-        require(success, "Precompiled call failed");
+
+        if (!success) {
+            errorHandler(out);
+        }
         return out;
     }
 
