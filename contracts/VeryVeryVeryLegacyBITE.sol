@@ -54,8 +54,8 @@ library BITE {
     uint256 constant internal TE_RETURN_SIZE_THRESHOLD = 323;
 
     /// @dev Minimum return size of ECIES precompile - 1
-    /// @dev 65 (min from crypto scheme) + 32 (min encoded size of input) - 1
-    uint256 constant internal ECIES_RETURN_SIZE_THRESHOLD = 96;
+    /// @dev 65 (min from crypto scheme - return size of encrypting less than 32 bytes) - 1
+    uint256 constant internal ECIES_RETURN_SIZE_THRESHOLD = 64;
 
     /// @notice Emitted when a CTX is successfully submitted
     /// @param callbackSender The address that will send the callback
