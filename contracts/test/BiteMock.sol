@@ -19,7 +19,7 @@
     along with bite-solidity.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// cspell:words deque ECIES
+// cspell:words deque
 
 pragma solidity >=0.8.27;
 

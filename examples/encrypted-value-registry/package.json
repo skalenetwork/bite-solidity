@@ -1,0 +1,10 @@
+{
+    "name": "@skalenetwork/bite-solidity-example-encrypted-value-registry",
+    "version": "1.0.0",
+    "scripts": {
+        "clean": "yarn run -T hardhat clean",
+        "cleanCompile": "yarn clean && yarn compile",
+        "compile": "yarn run -T hardhat compile",
+        "hardhat": "yarn run -T hardhat"
+    }
+}

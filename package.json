@@ -1,6 +1,6 @@
 {
   "name": "@skalenetwork/bite-solidity",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "packageManager": "yarn@4.6.0",
   "devDependencies": {
     "@types/node": ">=25.4.0",
@@ -11,6 +11,8 @@
     "typescript": ">=4.5.0"
   },
   "scripts": {
+    "clean": "yarn hardhat clean",
+    "cleanCompile": "yarn clean && yarn compile",
     "compile": "yarn hardhat compile",
     "cspell": "yarn exec cspell .",
     "fullCheck": "yarn compile && yarn lint && yarn cspell",
