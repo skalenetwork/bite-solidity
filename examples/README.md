@@ -82,6 +82,7 @@ evm_version = "istanbul"
 |---|---|---|
 | [Encrypted Value Registry](encrypted-value-registry/README.md) | Stores a value encrypted and reveals it to authorized accounts. Authorized viewers are hidden (encrypted). | CTX, ECIES, TE |
 | [Role-Based Value Registry](role-based-value-registry/README.md) | Manages confidential values per role, distributing role secrets to users and encrypting shared role values with a role public key. | Roles, CTX, ECIES, TE, re-encryption |
+| [Sealed-Bid Auction](sealed-bid-auction/README.md) | Auctions an NFT with fully encrypted bids. Decrypts the entire bid set through a self-referential CTX chain and settles with the highest qualified bidder. | CTX, TE, recursive CTX chain, ERC-20, ERC-721 |
 
 ## Local testing with mocks
 

@@ -332,15 +332,18 @@ contract SealedBidAuction is IBiteSupplicant, Ownable2Step {
             encryptedArgs[i] = encryptedBids[bids.length + i];
         }
         bytes[] memory plaintextArgs = new bytes[](0);
-
+        uint256 gasNeeded = gasForProcessingBids * missingBids;
+        if(missingBids < 5) {
+            gasNeeded += 350_000; // For final bids, in case only few are sent.
+        }
         address payable ctxSender = BITE.submitCTX(
             BITE.SUBMIT_CTX_ADDRESS,
-            gasForProcessingBids * missingBids,
+            gasNeeded,
             encryptedArgs,
             plaintextArgs
         );
         _authorizedCtxSenders[ctxSender] = true;
-        ctxSender.sendValue((350_000 + gasForProcessingBids * missingBids) * gasPrice);
+        ctxSender.sendValue(gasNeeded * gasPrice);
     }
 
     function _handleBidCallback(bytes[] calldata decryptedArgs, bytes[] calldata plaintextArgs) private {
