@@ -59,7 +59,7 @@ Additionally, for a larger real-world example, see the [SKALE confidential-token
 ```solidity
 // SPDX-License-Identifier: AGPL-3.0-only
 
-pragma solidity ^0.8.26;
+pragma solidity ^0.8.27;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { BITE } from "@skalenetwork/bite-solidity/BITE.sol";

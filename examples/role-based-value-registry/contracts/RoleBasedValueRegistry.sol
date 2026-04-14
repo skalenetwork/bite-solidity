@@ -21,7 +21,7 @@
 
 // cspell:words ECIES
 
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.27;
 
 import { BITE, PublicKey } from "@skalenetwork/bite-solidity/contracts/BITE.sol";
 import { IBiteSupplicant } from "@skalenetwork/bite-solidity/contracts/interfaces/IBiteSupplicant.sol";

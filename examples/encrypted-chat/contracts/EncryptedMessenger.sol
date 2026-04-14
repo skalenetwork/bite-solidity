@@ -19,7 +19,7 @@
     along with bite-solidity.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pragma solidity ^0.8.26;
+pragma solidity ^0.8.27;
 
 import { BITE, PublicKey } from "@skalenetwork/bite-solidity/contracts/BITE.sol";
 import { IBiteSupplicant } from "@skalenetwork/bite-solidity/contracts/interfaces/IBiteSupplicant.sol";

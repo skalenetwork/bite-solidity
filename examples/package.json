@@ -4,7 +4,8 @@
     "workspaces": [
         "encrypted-value-registry",
         "role-based-value-registry",
-        "encrypted-chat"
+        "encrypted-chat",
+        "sealed-bid-auction"
     ],
     "scripts": {
         "compile": "yarn workspaces foreach -A run compile",
