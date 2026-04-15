@@ -10,6 +10,7 @@
     "scripts": {
         "compile": "yarn workspaces foreach -A run compile",
         "clean": "yarn workspaces foreach -A run clean",
+        "test": "yarn workspaces foreach -A run test",
         "cleanCompile": "yarn clean && yarn compile",
         "tsc": "yarn exec tsc --noEmit"
     },
@@ -21,6 +22,8 @@
         "@skalenetwork/upgrade-tools": "4.0.0-develop.9",
         "@typechain/ethers-v6": "^0.5.1",
         "@typechain/hardhat": "^9.1.0",
+        "@types/chai": "^5.2.3",
+        "@types/mocha": "^10.0.10",
         "@types/node": ">=25.4.0",
         "chai": "^6.2.1",
         "chalk": "^5.6.2",

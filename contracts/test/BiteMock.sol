@@ -104,6 +104,7 @@ contract BiteMock is IBiteMock{
 
     DoubleEndedQueue.Bytes32Deque private _queue;
 
+    event CallbackFailed();
     error NoCallbacksQueued();
 
     /// @inheritdoc IBiteMock
@@ -132,6 +133,23 @@ contract BiteMock is IBiteMock{
         _queue.pushBack(bytes32(uint256(uint160(address(sender)))));
 
         return address(sender);
+    }
+
+    /// @notice Checks if there are any callbacks queued
+    /// @return numCallbacks The number of callbacks queued
+    function callbacksQueued() public view returns (uint256 numCallbacks) {
+        return _queue.length();
+    }
+
+    function sendAllCallbacksAllowFailures() external {
+        while (callbacksQueued() > 0) {
+            try this.sendCallback() {
+
+            } catch {
+                _queue.popFront();
+                emit CallbackFailed();
+            }
+        }
     }
 
     /// @inheritdoc IBiteMock

@@ -2232,7 +2232,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai@npm:*":
+"@types/chai@npm:*, @types/chai@npm:^5.2.3":
   version: 5.2.3
   resolution: "@types/chai@npm:5.2.3"
   dependencies:
@@ -2246,6 +2246,13 @@ __metadata:
   version: 4.0.2
   resolution: "@types/deep-eql@npm:4.0.2"
   checksum: 10c0/bf3f811843117900d7084b9d0c852da9a044d12eb40e6de73b552598a6843c21291a8a381b0532644574beecd5e3491c5ff3a0365ab86b15d59862c025384844
+  languageName: node
+  linkType: hard
+
+"@types/mocha@npm:^10.0.10":
+  version: 10.0.10
+  resolution: "@types/mocha@npm:10.0.10"
+  checksum: 10c0/d2b8c48138cde6923493e42b38e839695eb42edd04629abe480a8f34c0e3f50dd82a55832c2e8d2b6e6f9e4deb492d7d733e600fbbdd5a0ceccbcfc6844ff9d5
   languageName: node
   linkType: hard
 
@@ -5020,6 +5027,8 @@ __metadata:
     "@skalenetwork/upgrade-tools": "npm:4.0.0-develop.9"
     "@typechain/ethers-v6": "npm:^0.5.1"
     "@typechain/hardhat": "npm:^9.1.0"
+    "@types/chai": "npm:^5.2.3"
+    "@types/mocha": "npm:^10.0.10"
     "@types/node": "npm:>=25.4.0"
     chai: "npm:^6.2.1"
     chalk: "npm:^5.6.2"
