@@ -35,8 +35,7 @@ contract EncryptedMessenger is IBiteSupplicant {
         address user1;
         address user2;
         uint256[] messageIds;
-        PublicKey sessionKey;
-        bytes encryptedSessionKey;
+        PublicKey publicSessionKey;
         bytes encryptedSessionKeyForUser1;
         bytes encryptedSessionKeyForUser2;
     }
@@ -98,7 +97,7 @@ contract EncryptedMessenger is IBiteSupplicant {
             return;
         }
 
-        if(encryptedArgs.length == 1 && plaintextArgs.length == 4) {
+        if(encryptedArgs.length == 1 && plaintextArgs.length == 3) {
             _handleSessionCreation(encryptedArgs, plaintextArgs);
             return;
         }
@@ -127,7 +126,7 @@ contract EncryptedMessenger is IBiteSupplicant {
     function createSession(
         address user1,
         address user2,
-        PublicKey memory sessionKey,
+        PublicKey memory publicSessionKey,
         bytes memory encryptedSessionKey
     ) external payable {
         require(msg.sender == user1 || msg.sender == user2, AccessDenied());
@@ -135,14 +134,13 @@ contract EncryptedMessenger is IBiteSupplicant {
         require(_isUserRegistered(user2), UserNotRegistered(user2));
         require(!_sessionExists(_generateSessionId(user1, user2)), SessionAlreadyExistsForUsers(user1, user2));
         bytes[] memory encryptedArgs = new bytes[](1);
-        bytes[] memory plaintextArgs = new bytes[](4);
+        bytes[] memory plaintextArgs = new bytes[](3);
 
         encryptedArgs[0] = encryptedSessionKey;
 
         plaintextArgs[0] = abi.encode(user1);
         plaintextArgs[1] = abi.encode(user2);
-        plaintextArgs[2] = abi.encode(sessionKey);
-        plaintextArgs[3] = encryptedSessionKey;
+        plaintextArgs[2] = abi.encode(publicSessionKey);
 
         _createCTX(encryptedArgs, plaintextArgs, sessionCreationGas);
     }
@@ -224,7 +222,7 @@ contract EncryptedMessenger is IBiteSupplicant {
         bytes memory encryptedContent = BITE.encryptECIES(
             BITE.ENCRYPT_ECIES_ADDRESS,
             abi.encode(decryptedContent), // Needs to be decoded off-chain after decryption
-            session.sessionKey
+            session.publicSessionKey
         );
 
         uint256 messageId = messageIdCounter;
@@ -242,8 +240,7 @@ contract EncryptedMessenger is IBiteSupplicant {
     function _handleSessionCreation(bytes[] memory decryptedArgs, bytes[] memory plaintextArgs) private {
         address user1 = abi.decode(plaintextArgs[0], (address));
         address user2 = abi.decode(plaintextArgs[1], (address));
-        PublicKey memory sessionKey = abi.decode(plaintextArgs[2], (PublicKey));
-        bytes memory encryptedSessionKey = plaintextArgs[3];
+        PublicKey memory publicSessionKey = abi.decode(plaintextArgs[2], (PublicKey));
         bytes memory decryptedSessionKey = decryptedArgs[0];
 
         bytes memory encryptedSessionKeyForUser1;
@@ -265,8 +262,7 @@ contract EncryptedMessenger is IBiteSupplicant {
         Session storage session = sessions[sessionId];
         session.user1 = user1;
         session.user2 = user2;
-        session.sessionKey = sessionKey;
-        session.encryptedSessionKey = encryptedSessionKey;
+        session.publicSessionKey = publicSessionKey;
         session.encryptedSessionKeyForUser1 = encryptedSessionKeyForUser1;
         session.encryptedSessionKeyForUser2 = encryptedSessionKeyForUser2;
 
@@ -304,7 +300,7 @@ contract EncryptedMessenger is IBiteSupplicant {
     }
 
     function _sessionExists(uint256 sessionId) private view returns (bool) {
-        return sessions[sessionId].encryptedSessionKey.length != 0;
+        return sessions[sessionId].user1 != address(0);
     }
 
     function _generateSessionId(address user1, address user2) private pure returns (uint256) {
