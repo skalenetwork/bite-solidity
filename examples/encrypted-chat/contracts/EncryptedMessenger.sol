@@ -130,6 +130,7 @@ contract EncryptedMessenger is IBiteSupplicant {
         PublicKey memory sessionKey,
         bytes memory encryptedSessionKey
     ) external payable {
+        require(msg.sender == user1 || msg.sender == user2, AccessDenied());
         require(_isUserRegistered(user1), UserNotRegistered(user1));
         require(_isUserRegistered(user2), UserNotRegistered(user2));
         require(!_sessionExists(_generateSessionId(user1, user2)), SessionAlreadyExistsForUsers(user1, user2));
