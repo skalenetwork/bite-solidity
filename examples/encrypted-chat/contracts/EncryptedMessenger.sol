@@ -77,7 +77,11 @@ contract EncryptedMessenger is IBiteSupplicant {
     constructor() {}
 
     receive() external payable {
-        deposit();
+        _deposit(msg.sender);
+    }
+
+    function deposit() external payable {
+        _deposit(msg.sender);
     }
 
     function withdraw() external {
@@ -107,7 +111,7 @@ contract EncryptedMessenger is IBiteSupplicant {
 
     function registerUser(PublicKey memory publicKey) external payable {
         userPublicKeys[_publicKeyToAddress(publicKey)] = publicKey;
-        deposit();
+        _deposit(_publicKeyToAddress(publicKey));
     }
 
     function sendMessage(address to, bytes memory encryptedContent) external payable {
@@ -143,15 +147,6 @@ contract EncryptedMessenger is IBiteSupplicant {
         plaintextArgs[2] = abi.encode(publicSessionKey);
 
         _createCTX(encryptedArgs, plaintextArgs, sessionCreationGas);
-    }
-
-    // Public
-
-    function deposit() public payable {
-        if(msg.value > 0) {
-            userDeposits[msg.sender] += msg.value;
-            emit Deposit(msg.sender, msg.value);
-        }
     }
 
     // View functions
@@ -209,6 +204,13 @@ contract EncryptedMessenger is IBiteSupplicant {
 
     function sessionExists(address user1, address user2) external view returns (bool) {
         return _sessionExists(_generateSessionId(user1, user2));
+    }
+
+    function _deposit(address user) private {
+        if(msg.value > 0) {
+            userDeposits[user] += msg.value;
+            emit Deposit(user, msg.value);
+        }
     }
 
     function _handleMessageSending(bytes[] memory decryptedArgs, bytes[] memory plaintextArgs) private {
