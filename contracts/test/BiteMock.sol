@@ -43,16 +43,21 @@ interface IBiteMock {
         uint256 gasLimit,
         bytes[] calldata encryptedArgs,
         bytes[] calldata plaintextArgs
-    )
-        external
-        returns (address callbackSender);
+    ) external returns (address callbackSender);
 
     /// @notice Sends the next queued callback
     function sendCallback() external;
 
-    /// @notice Flushes the queue of pending callbacks
+    /// @notice Empties the queue of pending callbacks
     /// @dev This should be used in tests after a callback is reverted
-    function flushQueue() external;
+    function emptyCTXQueue() external;
+
+    /// @notice Removes the next queued callback if it reverts
+    /// @dev This should be used in tests after a callback is reverted
+    function removeNextCTXIfItReverts() external;
+
+    /// @notice forces removal of the next queued callback
+    function removeNextCTX() external;
 
     /// @notice Encrypts a message with TE encryption key
     /// @param message The message to encrypt
@@ -108,11 +113,35 @@ contract BiteMock is IBiteMock{
 
     DoubleEndedQueue.Bytes32Deque private _queue;
 
+    /// @notice Emitted when a callback is removed
+    /// @param senderAddress The address of the callback sender
+    event CallbackRemoved(address indexed senderAddress);
+
+
     error NoCallbacksQueued();
+    error CallbackDidNotRevert();
 
     /// @inheritdoc IBiteMock
-    function flushQueue() external override {
+    function emptyCTXQueue() external override {
         _queue.clear();
+    }
+
+    /// @inheritdoc IBiteMock
+    function removeNextCTXIfItReverts() external override {
+        require(!_queue.empty(), NoCallbacksQueued());
+        address payable senderAddress = payable(address(uint160(uint256(_queue.popFront()))));
+
+        try CallbackSender(senderAddress).sendCallback() {
+            revert CallbackDidNotRevert();
+        } catch {
+            emit CallbackRemoved(senderAddress);
+        }
+    }
+
+    /// @inheritdoc IBiteMock
+    function removeNextCTX() external override {
+        require(!_queue.empty(), NoCallbacksQueued());
+        _queue.popFront();
     }
 
     /// @inheritdoc IBiteMock
