@@ -113,10 +113,6 @@ contract BiteMock is IBiteMock{
 
     DoubleEndedQueue.Bytes32Deque private _queue;
 
-    /// @notice Emitted when a callback is removed
-    /// @param senderAddress The address of the callback sender
-    event CallbackRemoved(address indexed senderAddress);
-
 
     error NoCallbacksQueued();
     error CallbackDidNotRevert();
@@ -129,19 +125,20 @@ contract BiteMock is IBiteMock{
     /// @inheritdoc IBiteMock
     function removeNextCTXIfItReverts() external override {
         require(!_queue.empty(), NoCallbacksQueued());
+        uint256 initLength = _queue.length();
         address payable senderAddress = payable(address(uint160(uint256(_queue.popFront()))));
 
         try CallbackSender(senderAddress).sendCallback() {
             revert CallbackDidNotRevert();
         } catch {
-            emit CallbackRemoved(senderAddress);
+            assert(initLength > _queue.length());
         }
     }
 
     /// @inheritdoc IBiteMock
     function removeNextCTX() external override {
         require(!_queue.empty(), NoCallbacksQueued());
-        _queue.popFront();
+        assert(_queue.popFront() != bytes32(0));
     }
 
     /// @inheritdoc IBiteMock
