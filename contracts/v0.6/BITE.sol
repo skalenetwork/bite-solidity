@@ -29,8 +29,8 @@
 pragma solidity >=0.6.0;
 pragma experimental ABIEncoderV2;
 
-import { LegacyErrors } from "./Errors.sol";
 import { PublicKey } from "../types.sol";
+import { LegacyErrors } from "./Errors.sol";
 
 /**
  * @title BITE Library
