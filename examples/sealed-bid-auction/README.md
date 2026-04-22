@@ -40,7 +40,7 @@ Internally:
 
 ### 4. Bid registration callback (`onDecrypt` — bid path)
 
-When BITE decrypts the per-bid CTX, it calls `onDecrypt`. The contract recognises the bid path by `decryptedArgs.length == 1 && plaintextArgs.length == 2` and:
+When BITE decrypts the per-bid CTX, it calls `onDecrypt`. The contract recognizes the bid path by `decryptedArgs.length == 1 && plaintextArgs.length == 2` and:
 
 1. Decodes the bidder address from `plaintextArgs[0]` and the decrypted `Bid` struct from `decryptedArgs[0]`.
 2. Asserts `bid.bidder == bidder` — the encrypted bid must claim the same sender as the original transaction (prevents spoofing another account's identity).
@@ -67,7 +67,7 @@ Once `FINALIZED`, anyone can call `settleAuction()`. The contract iterates the l
 - **Accepts** the first bidder who can pay in full: pulls `bid.amount - minimumBid` additional ERC-20 from them, forwards the full `bid.amount` to the owner, and transfers the NFT to the winner.
 - If no bidder qualifies, the NFT is returned to the owner.
 
-After settlement, any remaining gas Tokens are divided equally among the remaining bidders as their gas refund share (`_refundGas`). Usualy this amount will be zero or very close to zero.
+After settlement, any remaining gas Tokens are divided equally among the remaining bidders as their gas refund share (`_refundGas`). Usually this amount will be zero or very close to zero.
 
 ### 7. Refunds
 
@@ -81,7 +81,7 @@ In case the auction gets permanently stuck, an emergency path allows refunds 7 d
 
 | Function | Visibility | Description |
 |---|---|---|
-| `constructor(nft, tokenId, minimumBid, currency, topWinnersCount)` | — | Takes custody of the NFT and initialises auction parameters |
+| `constructor(nft, tokenId, minimumBid, currency, topWinnersCount)` | — | Takes custody of the NFT and initializes auction parameters |
 | `startAuction(endTime)` | `external payable onlyOwner` | Opens the auction; requires gas Tokens for initial processing gas |
 | `cancelAuction()` | `external onlyOwner` | Cancels from `NOT_STARTED` or `OPEN`; returns NFT to owner |
 | `sendBid(encryptedBid)` | `external payable` | Submits an encrypted bid and funds the per-bid CTX callback |
@@ -99,7 +99,7 @@ In case the auction gets permanently stuck, an emergency path allows refunds 7 d
 
 The `TopUniqueBids` library (`contracts/libraries/TopUniqueBids.sol`) maintains a descending-sorted leaderboard of at most `cap` bids with **unique bidders**. If the same bidder submits a higher bid, the old entry is replaced in-place. Bids at or below the current last place are dropped when the leaderboard is full - first bids have priority on ties.
 
-It is a pure in-storage sorted insert — no off-chain sort is needed. It is reccomended to store a low amount of top bidders, for gas costs.Gas configs were not tested for numbers higher than 3.
+It is a pure in-storage sorted insert — no off-chain sort is needed. It is recommended to store a low amount of top bidders, for gas costs.Gas configs were not tested for numbers higher than 3.
 
 ## Script
 

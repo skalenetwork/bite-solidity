@@ -185,7 +185,7 @@ const main = async () => {
     console.log(`\nAuction started — ends at timestamp ${endTime.toString()} (${AUCTION_DURATION}s from now)`);
     console.log(`Auction state: ${(await auction.state()).toString()} (1 = OPEN)`);
 
-    const depositPerBid = minimumDepositPerBid; // TODO: Optionaly add buffer
+    const depositPerBid = minimumDepositPerBid; // TODO: Optionally add buffer
 
     for (const bidder of bidders) {
         const encodedBid = AbiCoder.defaultAbiCoder().encode(

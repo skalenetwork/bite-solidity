@@ -10,7 +10,7 @@
         { "name": "python", "path": "./dictionary/python.txt"}
     ],
     "dictionaries": ["domain-terms", "libraries", "names", "skale-terms", "solidity", "python"],
-    "words": ["ECIES"],
+    "words": ["ECIES", "IERC"],
     "ignorePaths": [
         ".solhint.json",
         "artifacts",

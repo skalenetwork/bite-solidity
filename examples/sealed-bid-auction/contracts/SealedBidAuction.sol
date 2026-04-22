@@ -69,8 +69,8 @@ contract SealedBidAuction is IBiteSupplicant, Ownable2Step {
 
     // Payment of decryption
     uint256 public gasPrice = tx.gasprice;
-    uint256 public immutable gasForBid = 500_000;            // This usualy cost arround 390-450k gas
-    uint256 public immutable gasForProcessingBids = 300_000; // This is usualy enough
+    uint256 public immutable gasForBid = 500_000;            // This usually cost around 390-450k gas
+    uint256 public immutable gasForProcessingBids = 300_000; // This is usually enough
     // Adding 300_00 buffer to avoid gas limit errors
     uint256 public immutable minimumDepositPerBid = (gasForBid + gasForProcessingBids) * gasPrice;
 
@@ -160,7 +160,7 @@ contract SealedBidAuction is IBiteSupplicant, Ownable2Step {
         require(
             state == AuctionState.SETTLED ||
             state == AuctionState.CANCELLED ||
-            block.timestamp > endTime + 7 days, // Allow to refund 7 days after the auction end date - in case of stucked bids
+            block.timestamp > endTime + 7 days, // Allow to refund 7 days after the auction end date - in case of stuck bids
             InvalidState(state)
         );
         if(_bidders.length() == 0 && address(this).balance > 0) {
