@@ -6,9 +6,7 @@ cd "$(dirname "$0")/.."
 
 $(./scripts/to_solidity_0.6.0.sh)
 
-rm contracts/VeryVeryVeryLegacyBITE.sol
+rm -r contracts/v0.6
 rm contracts/types.sol
 
-git checkout -- contracts/VeryVeryVeryVeryLegacyBITE.sol
-git checkout -- contracts/LegacyTypes.sol
-git checkout -- contracts/VeryLegacyErrors.sol
+git checkout -- contracts/v0.5
