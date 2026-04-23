@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 /**
- *   v0.6/Errors.sol - bite-solidity
+ *   Errors.sol - bite-solidity
  *   Copyright (C) 2026-Present SKALE Labs
  *   @author Eduardo Vasques
  *
@@ -27,10 +27,10 @@
 
 pragma solidity >=0.5.0;
 
-/// @title Legacy Errors Library
+/// @title Errors Library
 /// @author Eduardo Vasques
 /// @notice revert reasons and error handlers for BITE precompiles, compatible with old solidity versions
-library LegacyErrors {
+library Errors {
 
     // Cost/benefit here of using this pattern is worth the ignore
     /* solhint-disable code-complexity */
