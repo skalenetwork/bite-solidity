@@ -5,6 +5,7 @@
         "clean": "yarn run -T hardhat clean",
         "cleanCompile": "yarn clean && yarn compile",
         "compile": "yarn run -T hardhat compile",
-        "hardhat": "yarn run -T hardhat"
+        "hardhat": "yarn run -T hardhat",
+        "test": "yarn run -T hardhat test"
     }
 }

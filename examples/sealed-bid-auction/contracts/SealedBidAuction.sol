@@ -157,6 +157,7 @@ contract SealedBidAuction is IBiteSupplicant, Ownable2Step {
     }
 
     function refundBidder(address bidder) external {
+        require(state != AuctionState.NOT_STARTED, InvalidState(state));
         require(
             state == AuctionState.SETTLED ||
             state == AuctionState.CANCELLED ||
@@ -245,8 +246,8 @@ contract SealedBidAuction is IBiteSupplicant, Ownable2Step {
     }
 
     function sendBid(bytes calldata encryptedBid) external payable {
-        require(block.timestamp < endTime, AuctionEnded());
         require(state == AuctionState.OPEN, InvalidState(state));
+        require(block.timestamp < endTime, AuctionEnded());
         require(msg.value >= minimumDepositPerBid, NotEnoughDeposit());
         require(numBids[msg.sender] < maxBidsPerBidder, MaxBidsPerBidderReached());
         uint256 expectedLength = BITE.TE_RETURN_SIZE_THRESHOLD + 1 + 32;

@@ -50,6 +50,9 @@ interface IBiteMock {
     /// @notice Sends the next queued callback
     function sendCallback() external;
 
+    /// @notice Removes the next queued callback if it reverts
+    function removeNextCTXIfItReverts() external;
+
     /// @notice Encrypts a message with TE encryption key
     /// @param message The message to encrypt
     /// @return cypherText The encrypted message
@@ -104,6 +107,7 @@ contract BiteMock is IBiteMock{
 
     DoubleEndedQueue.Bytes32Deque private _queue;
 
+    error CallbackDidNotRevert();
     error NoCallbacksQueued();
 
     /// @inheritdoc IBiteMock
@@ -132,6 +136,19 @@ contract BiteMock is IBiteMock{
         _queue.pushBack(bytes32(uint256(uint160(address(sender)))));
 
         return address(sender);
+    }
+
+    /// @inheritdoc IBiteMock
+    function removeNextCTXIfItReverts() external override {
+        require(!_queue.empty(), NoCallbacksQueued());
+        uint256 initLength = _queue.length();
+        address payable senderAddress = payable(address(uint160(uint256(_queue.popFront()))));
+
+        try CallbackSender(senderAddress).sendCallback() {
+            revert CallbackDidNotRevert();
+        } catch {
+            assert(initLength > _queue.length());
+        }
     }
 
     /// @inheritdoc IBiteMock
