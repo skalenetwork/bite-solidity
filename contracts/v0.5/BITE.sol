@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 /*
-    v0.5/BITE.sol - bite-solidity
+    BITE.sol - bite-solidity
     Copyright (C) 2026-Present SKALE Labs
     @author Dmytro Stebaiev
     @author Eduardo Vasques
@@ -26,7 +26,7 @@
 pragma solidity >=0.5.0 <0.6.0;
 pragma experimental ABIEncoderV2;
 
-import { VeryLegacyErrors } from "./Errors.sol";
+import { Errors } from "./Errors.sol";
 import { Types } from "./types.sol";
 
 /**
@@ -79,7 +79,7 @@ library BITE {
                 gasLimit,
                 abi.encode(encryptedArguments, plaintextArguments)
             ),
-            VeryLegacyErrors.handleCTXPrecompileError
+            Errors.handleCTXPrecompileError
         );
 
         require(addressBytes.length == 20, "Incorrect return data length");
@@ -99,7 +99,7 @@ library BITE {
         cipherText = _staticcallPrecompiled(
             encryptTEaddress,
             abi.encode(text),
-            VeryLegacyErrors.handleTEPrecompileError
+            Errors.handleTEPrecompileError
         );
         require(cipherText.length != 0, "Empty return data");
         require(
@@ -125,7 +125,7 @@ library BITE {
         cipherText = _staticcallPrecompiled(
             encryptECIESaddress,
             abi.encode(text, publicKey.x, publicKey.y),
-            VeryLegacyErrors.handleECIESPrecompileError
+            Errors.handleECIESPrecompileError
         );
         require(cipherText.length != 0, "Empty return data");
         require(
