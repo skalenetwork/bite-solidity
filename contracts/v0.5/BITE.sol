@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 /*
-    VeryLegacyBITE.sol - bite-solidity
+    BITE.sol - bite-solidity
     Copyright (C) 2026-Present SKALE Labs
     @author Dmytro Stebaiev
     @author Eduardo Vasques
@@ -23,10 +23,11 @@
 // This file is developed for using with old solidity versions.abi
 // solhint-disable compiler-version
 
-pragma solidity >=0.8.4;
+pragma solidity >=0.5.0 <0.6.0;
+pragma experimental ABIEncoderV2;
 
-import { SubmitCTXErrors, EncryptECIESErrors, EncryptTEErrors } from "./Errors.sol";
-import { PublicKey } from "./types.sol";
+import { Errors } from "./Errors.sol";
+import { Types } from "./types.sol";
 
 /**
  * @title BITE Library
@@ -45,22 +46,17 @@ library BITE {
     /// @notice Address of the submitCTX precompiled contract
     address public constant SUBMIT_CTX_ADDRESS = address(0x1B);
 
-    /// @notice Minimum return size of ThresholdEncryption precompile - 1
+    /// @dev Minimum return size of ThresholdEncryption precompile - 1
     /// @dev 292 (min from crypto scheme) + 32 (min encoded size of input) - 1
     uint256 constant internal TE_RETURN_SIZE_THRESHOLD = 323;
 
-    /// @notice Minimum return size of ECIES precompile - 1
+    /// @dev Minimum return size of ECIES precompile - 1
     /// @dev 65 (min from crypto scheme - return size of encrypting less than 32 bytes) - 1
     uint256 constant internal ECIES_RETURN_SIZE_THRESHOLD = 64;
 
     /// @notice Emitted when a CTX is successfully submitted
     /// @param callbackSender The address that will send the callback
     event CTXSubmitted(address indexed callbackSender);
-
-    error EmptyReturnData(address precompiledContract);
-    error IncorrectReturnDataLength(address precompiledContract, uint256 expected, uint256 actual);
-    error InvalidReturnDataSize(address precompiledContract, uint256 expectedMin, uint256 actual);
-
 
     /// @notice Calls the SubmitCTX precompiled contract
     /// @param submitCTXAddress The address of the SubmitCTX precompiled contract
@@ -83,13 +79,11 @@ library BITE {
                 gasLimit,
                 abi.encode(encryptedArguments, plaintextArguments)
             ),
-            SubmitCTXErrors.handle
+            Errors.handleCTXPrecompileError
         );
 
-        if(addressBytes.length != 20) {
-            revert IncorrectReturnDataLength(submitCTXAddress, 20, addressBytes.length);
-        }
-        callbackSender = payable(address(_toBytes20(addressBytes)));
+        require(addressBytes.length == 20, "Incorrect return data length");
+        callbackSender = address(_toBytes20(addressBytes));
         // The system precompiled contract is called.
         // It's trusted and doesn't perform any external calls,
         // so reentrancy is not an issue here.
@@ -105,14 +99,13 @@ library BITE {
         cipherText = _staticcallPrecompiled(
             encryptTEaddress,
             abi.encode(text),
-            EncryptTEErrors.handle
+            Errors.handleTEPrecompileError
         );
-        if (cipherText.length == 0) {
-            revert EmptyReturnData(encryptTEaddress);
-        }
-        if (cipherText.length < TE_RETURN_SIZE_THRESHOLD + 1) {
-            revert InvalidReturnDataSize(encryptTEaddress, TE_RETURN_SIZE_THRESHOLD + 1, cipherText.length);
-        }
+        require(cipherText.length != 0, "Empty return data");
+        require(
+            cipherText.length > TE_RETURN_SIZE_THRESHOLD,
+            "Invalid return data size"
+        );
     }
 
     /// @notice Calls the EncryptECIES precompiled contract
@@ -123,7 +116,7 @@ library BITE {
     function encryptECIES(
         address encryptECIESaddress,
         bytes memory text,
-        PublicKey memory publicKey
+        Types.PublicKey memory publicKey
     )
         internal
         view
@@ -132,14 +125,14 @@ library BITE {
         cipherText = _staticcallPrecompiled(
             encryptECIESaddress,
             abi.encode(text, publicKey.x, publicKey.y),
-            EncryptECIESErrors.handle
+            Errors.handleECIESPrecompileError
         );
-        if (cipherText.length == 0) {
-            revert EmptyReturnData(encryptECIESaddress);
-        }
-        if (cipherText.length < ECIES_RETURN_SIZE_THRESHOLD + 1) {
-            revert InvalidReturnDataSize(encryptECIESaddress, ECIES_RETURN_SIZE_THRESHOLD + 1, cipherText.length);
-        }
+        require(cipherText.length != 0, "Empty return data");
+        require(
+            cipherText.length > ECIES_RETURN_SIZE_THRESHOLD,
+            "Invalid return data size"
+        );
+        return cipherText;
     }
 
     /**

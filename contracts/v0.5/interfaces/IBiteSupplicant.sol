@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 /**
- *   LegacyIBiteSupplicant.sol - bite-solidity
+ *   IBiteSupplicant.sol - bite-solidity
  *   Copyright (C) 2026-Present SKALE Labs
  *   @author Dmytro Stebaiev
  *

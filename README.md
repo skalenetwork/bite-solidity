@@ -42,13 +42,10 @@ If your project targets an older Solidity compiler, import the matching legacy f
 | File | Minimum Solidity version |
 |---|---|
 | `BITE.sol` | `>=0.8.27` |
-| `LegacyBITE.sol` | `>=0.8.5` |
-| `VeryLegacyBITE.sol` | `>=0.8.4` |
-| `VeryVeryLegacyBITE.sol` | `>=0.8.0` |
-| `VeryVeryVeryLegacyBITE.sol` | `>=0.6.0` |
-| `VeryVeryVeryVeryLegacyBITE.sol` | `>=0.5.0 <0.6.0` |
+| `v0.6/BITE.sol` | `>=0.6.0` |
+| `v0.5/BITE.sol` | `>=0.5.0 <0.6.0` |
 
-For Solidity `<0.6.0`, also use `LegacyTypes.sol` (which wraps `PublicKey` inside a `Types` library) and `LegacyIBiteSupplicant.sol` instead of their modern counterparts.
+For Solidity `<0.6.0`, also use `v0.5/types.sol` (which wraps `PublicKey` inside a `Types` library) and `v0.5/interfaces/IBiteSupplicant.sol` instead of their modern counterparts.
 
 
 Additionally, for a larger real-world example, see the [SKALE confidential-token repository](https://github.com/skalenetwork/confidential-token) and how it leverages `bite-solidity`.

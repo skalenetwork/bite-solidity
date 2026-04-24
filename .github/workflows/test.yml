@@ -54,88 +54,7 @@ jobs:
       run: yarn
 
     - name: Remove too old solc files
-      run: rm contracts/VeryVeryVeryVeryLegacyBITE.sol && rm contracts/LegacyTypes.sol && rm contracts/VeryLegacyErrors.sol
-
-    - name: Compile
-      env:
-        SOLC_VERSION: ${{ matrix.solc }}
-      run: yarn compile
-
-  solidity-0-8-5-compilation:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        solc: [0.8.26, 0.8.25, 0.8.24, 0.8.23, 0.8.22, 0.8.21, 0.8.20, 0.8.19, 0.8.18, 0.8.17, 0.8.16, 0.8.15, 0.8.14, 0.8.13, 0.8.12, 0.8.11, 0.8.10, 0.8.9, 0.8.8, 0.8.7, 0.8.6, 0.8.5]
-
-    steps:
-    - uses: actions/checkout@v6
-
-    - name: Set up Node
-      uses: actions/setup-node@v6
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'yarn'
-
-    - name: Install project
-      run: yarn
-
-    - name: Remove modern solc files
-      run: scripts/to_solidity_0.8.5.sh
-
-    - name: Compile
-      env:
-        SOLC_VERSION: ${{ matrix.solc }}
-      run: yarn compile
-
-  solidity-0-8-4-compilation:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        solc: [0.8.4]
-
-    steps:
-    - uses: actions/checkout@v6
-
-    - name: Set up Node
-      uses: actions/setup-node@v6
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'yarn'
-
-    - name: Install project
-      run: yarn
-
-    - name: Remove modern solc files
-      run: scripts/to_solidity_0.8.4.sh
-
-    - name: Compile
-      env:
-        SOLC_VERSION: ${{ matrix.solc }}
-      run: yarn compile
-
-  solidity-0-8-0-compilation:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        solc: [0.8.3, 0.8.2, 0.8.1, 0.8.0]
-
-    steps:
-    - uses: actions/checkout@v6
-
-    - name: Set up Node
-      uses: actions/setup-node@v6
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'yarn'
-
-    - name: Install project
-      run: yarn
-
-    - name: Remove modern solc files
-      run: scripts/to_solidity_0.8.0.sh
+      run: rm -r contracts/v0.5
 
     - name: Compile
       env:
@@ -147,7 +66,7 @@ jobs:
 
     strategy:
       matrix:
-        solc: [0.7.6, 0.7.5, 0.7.4, 0.7.3, 0.7.2, 0.7.1, 0.7.0, 0.6.12, 0.6.11, 0.6.10, 0.6.9, 0.6.8, 0.6.7, 0.6.6, 0.6.5, 0.6.4, 0.6.3, 0.6.2, 0.6.1, 0.6.0]
+        solc: [0.8.26, 0.8.25, 0.8.24, 0.8.23, 0.8.22, 0.8.21, 0.8.20, 0.8.19, 0.8.18, 0.8.17, 0.8.16, 0.8.15, 0.8.14, 0.8.13, 0.8.12, 0.8.11, 0.8.10, 0.8.9, 0.8.8, 0.8.7, 0.8.6, 0.8.5, 0.8.4, 0.8.3, 0.8.2, 0.8.1, 0.8.0, 0.7.6, 0.7.5, 0.7.4, 0.7.3, 0.7.2, 0.7.1, 0.7.0, 0.6.12, 0.6.11, 0.6.10, 0.6.9, 0.6.8, 0.6.7, 0.6.6, 0.6.5, 0.6.4, 0.6.3, 0.6.2, 0.6.1, 0.6.0]
 
     steps:
     - uses: actions/checkout@v6

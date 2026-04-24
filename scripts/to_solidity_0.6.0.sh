@@ -4,7 +4,8 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-$(./scripts/to_solidity_0.8.0.sh)
-
-rm contracts/VeryVeryLegacyBITE.sol
+rm -r contracts/test
+rm contracts/BITE.sol
+rm contracts/Errors.sol
 rm contracts/interfaces/IBiteSupplicant.sol
+rm -r contracts/v0.5

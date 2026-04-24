@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 /*
-    VeryVeryLegacyBITE.sol - bite-solidity
+    BITE.sol - bite-solidity
     Copyright (C) 2026-Present SKALE Labs
     @author Dmytro Stebaiev
     @author Eduardo Vasques
@@ -26,10 +26,11 @@
 // This file is developed for using with old solidity versions.abi
 // solhint-disable compiler-version
 
-pragma solidity >=0.8.0;
+pragma solidity >=0.6.0;
+pragma experimental ABIEncoderV2;
 
-import { LegacyErrors } from "./LegacyErrors.sol";
-import { PublicKey } from "./types.sol";
+import { PublicKey } from "../types.sol";
+import { Errors } from "./Errors.sol";
 
 /**
  * @title BITE Library
@@ -81,7 +82,7 @@ library BITE {
                 gasLimit,
                 abi.encode(encryptedArguments, plaintextArguments)
             ),
-            LegacyErrors.handleCTXPrecompileError
+            Errors.handleCTXPrecompileError
         );
 
         require(addressBytes.length == 20, "Incorrect return data length");
@@ -101,13 +102,14 @@ library BITE {
         cipherText = _staticcallPrecompiled(
             encryptTEaddress,
             abi.encode(text),
-            LegacyErrors.handleTEPrecompileError
+            Errors.handleTEPrecompileError
         );
         require(cipherText.length != 0, "Empty return data");
         require(
             cipherText.length > TE_RETURN_SIZE_THRESHOLD,
             "Invalid return data size"
         );
+        return cipherText;
     }
 
     /// @notice Calls the EncryptECIES precompiled contract
@@ -127,13 +129,14 @@ library BITE {
         cipherText = _staticcallPrecompiled(
             encryptECIESaddress,
             abi.encode(text, publicKey.x, publicKey.y),
-            LegacyErrors.handleECIESPrecompileError
+            Errors.handleECIESPrecompileError
         );
         require(cipherText.length != 0, "Empty return data");
         require(
             cipherText.length > ECIES_RETURN_SIZE_THRESHOLD,
             "Invalid return data size"
         );
+        return cipherText;
     }
 
     /**
