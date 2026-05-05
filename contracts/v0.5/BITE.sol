@@ -91,6 +91,22 @@ library BITE {
         emit CTXSubmitted(callbackSender);
     }
 
+    /// @notice Calls the SubmitCTX precompiled contract at the default address
+    /// @param gasLimit The gas limit for the callback
+    /// @param encryptedArguments The encrypted arguments to pass to the precompiled contract
+    /// @param plaintextArguments The plaintext arguments to pass to the precompiled contract
+    /// @return callbackSender The address that will send the callback
+    function submitCTX(
+        uint256 gasLimit,
+        bytes[] memory encryptedArguments,
+        bytes[] memory plaintextArguments
+    )
+        internal
+        returns (address payable callbackSender)
+    {
+        return submitCTX(SUBMIT_CTX_ADDRESS, gasLimit, encryptedArguments, plaintextArguments);
+    }
+
     /// @notice Calls the EncryptTE precompiled contract
     /// @param encryptTEaddress The address of the EncryptTE precompiled contract
     /// @param text The plaintext data to encrypt
@@ -106,6 +122,13 @@ library BITE {
             cipherText.length > TE_RETURN_SIZE_THRESHOLD,
             "Invalid return data size"
         );
+    }
+
+    /// @notice Calls the EncryptTE precompiled contract at the default address
+    /// @param text The plaintext data to encrypt
+    /// @return cipherText The encrypted data returned by the precompiled contract
+    function encryptTE(bytes memory text) internal view returns (bytes memory cipherText) {
+        return encryptTE(ENCRYPT_TE_ADDRESS, text);
     }
 
     /// @notice Calls the EncryptECIES precompiled contract
@@ -133,6 +156,18 @@ library BITE {
             "Invalid return data size"
         );
         return cipherText;
+    }
+
+    /// @notice Calls the EncryptECIES precompiled contract at the default address
+    /// @param text The plaintext data to encrypt
+    /// @param publicKey The public key to use for encryption
+    /// @return cipherText The encrypted data returned by the precompiled contract
+    function encryptECIES(bytes memory text, Types.PublicKey memory publicKey)
+        internal
+        view
+        returns (bytes memory cipherText)
+    {
+        return encryptECIES(ENCRYPT_ECIES_ADDRESS, text, publicKey);
     }
 
     /**
