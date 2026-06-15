@@ -43,12 +43,21 @@ interface IBiteMock {
         uint256 gasLimit,
         bytes[] calldata encryptedArgs,
         bytes[] calldata plaintextArgs
-    )
-        external
-        returns (address callbackSender);
+    ) external returns (address callbackSender);
 
     /// @notice Sends the next queued callback
     function sendCallback() external;
+
+    /// @notice Empties the queue of pending callbacks
+    /// @dev This should be used in tests after a callback is reverted
+    function emptyCTXQueue() external;
+
+    /// @notice Removes the next queued callback if it reverts
+    /// @dev This should be used in tests after a callback is reverted
+    function removeNextCTXIfItReverts() external;
+
+    /// @notice forces removal of the next queued callback
+    function removeNextCTX() external;
 
     /// @notice Encrypts a message with TE encryption key
     /// @param message The message to encrypt
@@ -104,7 +113,33 @@ contract BiteMock is IBiteMock{
 
     DoubleEndedQueue.Bytes32Deque private _queue;
 
+
     error NoCallbacksQueued();
+    error CallbackDidNotRevert();
+
+    /// @inheritdoc IBiteMock
+    function emptyCTXQueue() external override {
+        _queue.clear();
+    }
+
+    /// @inheritdoc IBiteMock
+    function removeNextCTXIfItReverts() external override {
+        require(!_queue.empty(), NoCallbacksQueued());
+        uint256 initLength = _queue.length();
+        address payable senderAddress = payable(address(uint160(uint256(_queue.popFront()))));
+
+        try CallbackSender(senderAddress).sendCallback() {
+            revert CallbackDidNotRevert();
+        } catch {
+            assert(initLength > _queue.length());
+        }
+    }
+
+    /// @inheritdoc IBiteMock
+    function removeNextCTX() external override {
+        require(!_queue.empty(), NoCallbacksQueued());
+        assert(_queue.popFront() != bytes32(0));
+    }
 
     /// @inheritdoc IBiteMock
     function submitCTX(
@@ -156,13 +191,13 @@ contract BiteMock is IBiteMock{
     {
         cypherText = _symmetricCipher(message, pubKeyToUint256(keyX, keyY));
         // Append ECIES overhead
-        return _addOverhead(cypherText, ECIES_OVERHEAD);
+        return _addOverhead(cypherText, message, ECIES_OVERHEAD);
     }
 
     /// @inheritdoc IBiteMock
     function encryptTE(bytes memory message) public pure override returns (bytes memory cypherText) {
         cypherText = _symmetricCipher(message, MOCK_TE_KEY);
-        return _addOverhead(cypherText, TE_OVERHEAD);
+        return _addOverhead(cypherText, message, TE_OVERHEAD);
     }
 
     /// @inheritdoc IBiteMock
@@ -212,14 +247,34 @@ contract BiteMock is IBiteMock{
     }
 
     /// @notice Adds overhead bytes to the end of data
-    /// @param data The data to process
+    /// @param encryptedData The data to process
+    /// @param plaintextData The plaintext data to add to the end of the encrypted data
     /// @param overhead The number of overhead bytes to add
     /// @return result The data with overhead
-    function _addOverhead(bytes memory data, uint256 overhead) private pure returns (bytes memory result) {
-        uint256 dataLength = data.length;
-        result = new bytes(dataLength + overhead);
+    function _addOverhead(
+        bytes memory encryptedData,
+        bytes memory plaintextData,
+        uint256 overhead
+    ) private pure returns (bytes memory result) {
+        uint256 dataLength = encryptedData.length;
+        uint256 resultLength = dataLength + overhead;
+        result = new bytes(resultLength);
         for (uint256 i = 0; i < dataLength; ++i) {
-            result[i] = data[i];
+            result[i] = encryptedData[i];
+        }
+
+        // Add a readable marker + plaintext into overhead for test/debug visibility
+        bytes memory prefix = bytes("MOCKv1|");
+        uint256 prefixLength = prefix.length;
+        uint256 writePos = dataLength;
+        for (uint256 i = 0; i < prefixLength; ++i) {
+            result[writePos] = prefix[i];
+            ++writePos;
+        }
+        uint256 plaintextLength = plaintextData.length;
+        for (uint256 i = 0; i < plaintextLength && writePos < resultLength; ++i) {
+            result[writePos] = plaintextData[i];
+            ++writePos;
         }
     }
 
