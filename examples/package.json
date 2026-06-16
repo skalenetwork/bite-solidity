@@ -2,11 +2,15 @@
     "private": true,
     "packageManager": "yarn@4.12.0",
     "workspaces": [
-        "encrypted-value-registry"
+        "encrypted-value-registry",
+        "role-based-value-registry",
+        "encrypted-chat",
+        "sealed-bid-auction"
     ],
     "scripts": {
         "compile": "yarn workspaces foreach -A run compile",
         "clean": "yarn workspaces foreach -A run clean",
+        "test": "yarn workspaces foreach -A run test",
         "cleanCompile": "yarn clean && yarn compile",
         "tsc": "yarn exec tsc --noEmit"
     },
@@ -14,11 +18,15 @@
         "@nomicfoundation/hardhat-chai-matchers": "^2.1.2",
         "@nomicfoundation/hardhat-ethers": "^3.1.2",
         "@nomicfoundation/hardhat-network-helpers": "^1.1.2",
-        "@skalenetwork/bite": "^0.7.2",
+        "@skalenetwork/bite": "^0.8.1-develop.0",
+        "@skalenetwork/upgrade-tools": "4.0.0-develop.9",
         "@typechain/ethers-v6": "^0.5.1",
         "@typechain/hardhat": "^9.1.0",
+        "@types/chai": "^5.2.3",
+        "@types/mocha": "^10.0.10",
         "@types/node": ">=25.4.0",
         "chai": "^6.2.1",
+        "chalk": "^5.6.2",
         "dotenv": "^17.3.1",
         "ethers": "^6.16.0",
         "hardhat": "^2.27.19",

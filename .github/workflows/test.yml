@@ -2,7 +2,7 @@ name: test
 on: [push]
 
 env:
-  NODE_VERSION: 22
+  NODE_VERSION: 24
 
 jobs:
   test:
@@ -33,6 +33,34 @@ jobs:
       with:
         ignore-compile: true
         node-version: ${{ env.NODE_VERSION }}
+
+  examples:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        submodules: true
+
+    - name: Set up Node
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'yarn'
+
+    - name: Install project
+      run: yarn install
+
+    - name: Compile examples
+      run: yarn compile
+
+    - name: Type check examples
+      run: yarn tsc
+
+    - name: Test examples
+      run: yarn test
 
   compilation:
     runs-on: ubuntu-latest

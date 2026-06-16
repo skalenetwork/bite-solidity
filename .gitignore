@@ -156,3 +156,7 @@ ignition/deployments/chain-31337
 /examples/**/cache
 /examples/**/typechain-types
 /examples/**/contracts/hardhat-dependency-compiler
+
+package-lock.json
+.env
+.next/
