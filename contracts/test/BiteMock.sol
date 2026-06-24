@@ -50,6 +50,10 @@ interface IBiteMock {
     /// @notice Sends the next queued callback
     function sendCallback() external;
 
+    /// @notice Returns an address of the next CallbackSender
+    /// @return callbackSender The address of the next CallbackSender
+    function getNextCallbackSender() external view returns (CallbackSender callbackSender);
+
     /// @notice Encrypts a message with TE encryption key
     /// @param message The message to encrypt
     /// @return cypherText The encrypted message
@@ -139,6 +143,12 @@ contract BiteMock is IBiteMock{
         require(!_queue.empty(), NoCallbacksQueued());
         address payable senderAddress = payable(address(uint160(uint256(_queue.popFront()))));
         CallbackSender(senderAddress).sendCallback();
+    }
+
+    /// @inheritdoc IBiteMock
+    function getNextCallbackSender() external view override returns (CallbackSender callbackSender) {
+        require(!_queue.empty(), NoCallbacksQueued());
+        return CallbackSender(payable(address(uint160(uint256(_queue.front())))));
     }
 
     // Public
