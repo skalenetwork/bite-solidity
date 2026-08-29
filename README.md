@@ -7,13 +7,13 @@
 [![Discord](https://img.shields.io/discord/534485763354787851.svg)](https://discord.gg/skale)
 [![Build Status](https://github.com/skalenetwork/bite-solidity/actions/workflows/test.yml/badge.svg)](https://github.com/skalenetwork/bite-solidity/actions)
 
-<p> A Solidity Library for building smart contracts that leverage BITE 2 on SKALE. </p>
+<p> A Solidity Library for building smart contracts that leverage BITE on SKALE. </p>
 
 </div>
 
 ## Introduction
 
-Solidity library for building smart contracts that leverage SKALE's BITE 2 blockchain capabilities. It exposes wrappers around the BITE-specific precompiled contracts for threshold encryption (TE), ECIES encryption, and conditional transaction (CTX) submission, plus the callback interface that contracts must implement.
+Solidity library for building smart contracts that leverage SKALE's BITE blockchain capabilities. It exposes wrappers around the BITE-specific precompiled contracts for threshold encryption (TE), ECIES encryption, and conditional transaction (CTX) submission, plus the callback interface that contracts must implement.
 
 ## Installation
 
