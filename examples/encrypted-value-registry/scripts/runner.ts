@@ -8,7 +8,7 @@ dotenv.config({ quiet: true });
 
 // should be the deployer's private key
 const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
-// should be BITE 2 chain
+// should be BITE chain
 const RPC_URL = process.env.ENDPOINT ||"https://base-sepolia-testnet.skalenodes.com/v1/bite-v2-sandbox";
 // should be the address of the deployed EncryptedValueRegistry contract
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || "";
