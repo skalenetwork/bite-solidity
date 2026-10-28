@@ -1,7 +1,8 @@
 {
   "name": "@skalenetwork/bite-solidity",
   "version": "1.0.1",
-  "packageManager": "yarn@4.6.0",
+  "repository": "git@github.com:skalenetwork/bite-solidity.git",
+  "packageManager": "yarn@4.18.1",
   "devDependencies": {
     "@types/node": ">=25.4.0",
     "cspell": "^9.7.0",

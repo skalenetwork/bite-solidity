@@ -15,11 +15,16 @@ on:
       - 'custom-release-*'
 
 env:
-  NODE_VERSION: 22
+  NODE_VERSION: 24
+
+permissions:
+  id-token: write
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.pull_request.merged
     steps:
     - uses: actions/checkout@v6
 
@@ -50,7 +55,6 @@ jobs:
       run: ./scripts/publish_package.sh
       env:
         BRANCH: ${{ env.BRANCH }}
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Create Release
       uses: ncipollo/release-action@v1
