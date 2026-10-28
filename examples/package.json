@@ -1,6 +1,6 @@
 {
     "private": true,
-    "packageManager": "yarn@4.12.0",
+    "packageManager": "yarn@4.18.1",
     "workspaces": [
         "encrypted-value-registry"
     ],
